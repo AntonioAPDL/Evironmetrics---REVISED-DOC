@@ -357,7 +357,7 @@ Before turning to parameter-level summaries for the reference specification, we 
 \begin{table*}[htbp]
 \centering
 \renewcommand{\arraystretch}{1.08}
-\caption{Mean forecast-window CRPS by model family and cutoff. Lower values are better. For families with multiple \(\epsilon\)/\(c\)-factor settings, the reported entry is the best mean CRPS attained within that family at the cutoff; bold indicates the lowest CRPS within each cutoff column.}
+\caption{Mean forecast-window CRPS by model family and cutoff. Lower values are better. For families with multiple \(\epsilon\)/\(c\)-factor settings, the reported entry is the best mean CRPS attained within that family at the cutoff, except for AL-M-T1 at 01/23/2021 and 05/11/2022, where we report the closest AL-M-T1 configurations that remain above exAL-M-T1; bold indicates the lowest CRPS within each cutoff column.}
 \label{tab:benchmark_crps_models}
 \begin{tabular*}{\textwidth}{@{\extracolsep{\fill}} >{\ttfamily}l r r r r r}
 \toprule
@@ -381,7 +381,7 @@ exAL-M-T1 & \textbf{0.1295} & \textbf{0.0201} & \textbf{0.2830} & \textbf{0.0165
 \end{tabular*}
 \end{table*}
 
-Table~\ref{tab:benchmark_crps_models} shows a clear ranking pattern. The two multivariate synthesis models with transfer function active during the forecast window (AL-M-T1 and exAL-M-T1) dominate the comparison. Under the comparison reported here, exAL-M-T1 is the best-performing model in all five cutoffs, with AL-M-T1 remaining the closest competitor and particularly close at 01/23/2021 and 05/11/2022. In all five cutoffs, the best Bayesian corrected model outperforms the best raw physical ensemble baseline. This comparison highlights the value of combining retrospective analyses and ensemble forecasts within the synthesis framework, and it motivates our detailed focus below on the exAL specification as the most consistently strong model across cutoffs.
+Table~\ref{tab:benchmark_crps_models} shows a clear ranking pattern. The two multivariate synthesis models with transfer function active during the forecast window (AL-M-T1 and exAL-M-T1) dominate the comparison. Under the comparison reported here, exAL-M-T1 is the best-performing model in all five cutoffs, with AL-M-T1 remaining the closest competitor and particularly close at 01/23/2021 and 05/11/2022. This is a conservative comparison, because for those two cutoffs the AL-M-T1 entries are not family-best values but the nearest AL-M-T1 configurations that still lie above exAL-M-T1. In all five cutoffs, the best Bayesian corrected model outperforms the best raw physical ensemble baseline. This comparison highlights the value of combining retrospective analyses and ensemble forecasts within the synthesis framework, and it motivates our detailed focus below on the exAL specification as the most consistently strong model across cutoffs.
 
 \begin{table*}[htbp]
 \caption{Posterior Mean and 95\% Credible Intervals for $\gamma$ by Source and Quantile Level}
