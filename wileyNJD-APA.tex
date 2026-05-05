@@ -67,7 +67,7 @@ We develop a Bayesian quantile-based correction-and-synthesis framework for rive
 
 We study this framework using daily river flow for the San Lorenzo River together with retrospective and forecast products from ECMWF/GloFAS and NOAA/NWS. The empirical focus is forecasting performance and uncertainty quantification across multiple quantile levels, rather than only historical fit or methodological development in isolation. Although the application is hydrological, the same structure is relevant in other settings where observations, retrospective products, and forecast products all play distinct roles.
 
-The remainder of the paper is organized as follows. Section~\ref{sec:methodology} outlines the methodology, including the development and application of Dynamic Quantile Linear Models, the integration of retrospective and forecast products, prior specifications, and posterior inference algorithms. Section~\ref{sec:data} describes the San Lorenzo River flow observations and the climate agency forecast products used in this study. In Section~\ref{sec:results}, we present the results of the analysis, including predictions for multiple quantiles,  correction of forecast biases, and synthesis of forecasting products. Finally, Section~\ref{sec5} provides concluding discussion.
+The remainder of the paper is organized as follows. Section~\ref{sec:methodology} presents the modeling framework and inference strategy. Section~\ref{sec:data} describes the San Lorenzo application, the data sources, and the rolling-origin forecasting design. Section~\ref{sec:forecastvalidation} reports the out-of-sample forecast validation results, and Section~\ref{sec:interpretation} presents supporting interpretation for the selected specification. Section~\ref{sec5} concludes.
 
 \section{METHODOLOGY}
 \label{sec:methodology}
@@ -222,12 +222,14 @@ We use CRPS because it scores the full predictive distribution and accounts join
 \]
 It also reduces to the mean absolute error for deterministic forecasts, which makes it a natural criterion for comparing the candidate predictive specifications considered below.
 
-\section{FORECASTING THE SAN LORENZO RIVER FLOW}
+\section{APPLICATION DATA AND FORECASTING DESIGN}
 \label{sec:data}
+
+\subsection{Study Setting and Target Observations}
 
 We analyze measurements, retrospective analyses, and forecasts of the average daily natural water flow (in cubic feet per second) of the San Lorenzo River at the Big Trees USGS gauging station in Santa Cruz, California. The Big Trees location is characterized by minimal human intervention, resulting in flow patterns that closely reflect natural river dynamics. Our dataset covers the period from May 29, 1987, to December 25, 2022, comprising 12,986 daily observations (see Figure~\ref{fig:sanlorenzo}), with measurements provided by the United States Geological Survey (USGS).
 
-The San Lorenzo River serves as a vital water resource for the Santa Cruz area, supporting regional ecology, water supply, and flood management. Recent hydrological events underscore its significance: heavy rainfall in late 2022 and early 2023 caused substantial flooding in Santa Cruz, while a severe drought during mid-2022 highlighted the ongoing need for accurate, long-term river flow forecasting. As the main source for the city's water reservoir, effective monitoring and forecasting of the San Lorenzo River are essential for both short-term flood response and long-term water resource planning.
+The San Lorenzo River is a major water resource for the Santa Cruz area and is relevant to both flood response and longer-term water-supply planning. The record includes major flood episodes as well as prolonged dry conditions, making it a useful setting for studying both low-flow and high-flow behavior.
 
 \begin{figure}[h]
 \centering
@@ -238,7 +240,9 @@ Daily water flow (log-log scale, cm$^3$/s) of the San Lorenzo River at the Big T
 \label{fig:sanlorenzo}
 \end{figure}
 
-Understanding the long-term behavior of lower quantiles of river flow is crucial for assessing drought conditions, while analyzing short-term fluctuations in higher quantiles is key to predicting sudden flood events. Our analysis focuses on characterizing the temporal evolution of each component in the dynamic model and evaluating how external information influences the quantiles of interest. Specifically, we incorporate retrospective analysis products from two climate agencies, estimating and propagating their discrepancies with observed data to enhance future forecasts and improve quantile prediction accuracy.
+Lower quantiles are relevant for drought conditions, whereas upper quantiles are relevant for flood risk. The application therefore combines retrospective products from two climate agencies with local and large-scale covariates to study how external information changes the predicted quantiles over time and during the forecast window.
+
+\subsection{External Data Sources and Forecast Covariates}
 
 To capture the drivers of river flow dynamics, we include several external variables of physical and climatic relevance. These encompass precipitation, soil moisture, and a suite of climate and environmental indices, primarily sourced from \citet{noaa_climate_indices}. Because these indices are reported monthly, we employ spline and linear interpolation techniques to downscale them to a daily frequency, aligning with the temporal resolution of hydrological and meteorological observations.
 
@@ -257,7 +261,7 @@ Scaled daily series of local precipitation, local soil moisture estimates, and t
 \label{fig:covariates}
 \end{figure*}
 
-Our model integrates retrospective analysis products from two primary sources: the Global Flood Awareness System (GloFAS) by the ECMWF, which provides global flood forecasts and monitoring data; and the National Weather Service (NWS) operated by the National Oceanic and Atmospheric Administration (NOAA), which delivers weather, water, and climate forecasts and warnings for the United States. See Figure~\ref{fig:retrospectives}.
+We use retrospective products from two primary sources: the Global Flood Awareness System (GloFAS) operated by ECMWF, and the National Weather Service (NWS) operated by NOAA. Figure~\ref{fig:retrospectives} shows the corresponding retrospective series at the Big Trees station.
 
 Each retrospective analysis is linked to an ensemble forecast. The NWS ensemble consists of 7 members: 6 members offer medium-range forecasts up to 8.5 days, and one control member extends to 10 days. In contrast, the GloFAS ensemble contains 51 members, all providing medium-range forecasts for up to 28 days.
 
@@ -268,25 +272,7 @@ Each retrospective analysis is linked to an ensemble forecast. The NWS ensemble 
 \label{fig:retrospectives}
 \end{figure*}
 
-GloFAS and NWS continuously generate ensemble forecasts, but at different frequencies: GloFAS issues forecasts daily, while NWS issues them hourly. To ensure temporal consistency across sources, we aggregate the NWS hourly forecasts into daily averages. Moreover, due to the varying forecast horizons provided by each agency, a single target date may be covered by multiple predictions from the same forecast ensemble member, both the most recently issued forecast and earlier forecasts whose horizons extend to that date or after. As a result, for each target date and ensemble member, there is a set of available predictions originating from different forecast issuance times.
-
-Rather than relying solely on the most recent forecast, we aggregate all available predictions for each target date using a weighted average. Predictions issued closer to the target date receive higher weights, reflecting their likely higher accuracy. This approach aims to leverage the availability of forecast information while accounting for the diminishing relevance of older predictions.
-
-Let \(T\) denote the reference date for which forecasts are being processed, and let \(k\) be the number of days ahead of \(T\) (i.e., the forecast lead time), with \(k = 1, \ldots, K_{(j)}\), where \(K_{(j)}\) is the maximum forecast horizon for the \(j\)-th forecaster. For each ensemble member \(i\) and forecaster \(j\), we define the aggregated \(k\)-step-ahead forecast for target date \(T+k\) as \( \Bar{y}^{j,i}_T(k) = \sum_{r=0}^{K_{(j)}-k} \omega(r, \alpha)\, y^{j,i}_{T-r}(r + k), \)
-where \(y^{j,i}_{T-r}(r + k)\) is the forecast issued at time \(T - r\) for target date \(T + k\), and \(\omega(r, \alpha)\) is a weight assigned to each forecast. The weights are defined as \(\omega(r, \alpha) \propto 1/r^{\alpha}\), so that forecasts issued closer to the target date (\(r = 0\)) receive greater weight. For this analysis, we set \(\alpha = 1\).
-
-In our analysis, we processed all available daily forecasts generated up to December 26, 2022. Figure~\ref{fig:ensembles} displays the retrospective analyses and forecast ensembles for both GloFAS and NWS, along with USGS measurements covering the periods before and after the forecasting window. The GloFAS ensemble forecasts extend from December 25, 2022 to January 22, 2023, while the NWS ensemble forecasts cover December 25, 2022 to January 5, 2023. We also highlight January 9, 2023, the date of a major flood event in Santa Cruz County.
-
-\begin{figure*}[hbt!]
-\centering
-\centerline{\includegraphics[width=450pt]{DISC/forecats.png}}
-\caption{
-\textbf{Before 2022-12-26:} Green—USGS measurements; Purple—NWS retrospective analysis; Orange—GloFAS retrospective analysis. \textbf{From 2022-12-26 onward:} Red—future (unobserved) USGS measurements; Purple—NWS 7-member ensemble forecast (showing little variability among members), covering 2022-12-25 to 2023-01-05; Orange—GloFAS 51-member ensemble forecast, covering 2022-12-25 to 2023-01-22. Horizontal dashed lines indicate official flood stages for the river.
-}
-\label{fig:ensembles}
-\end{figure*}
-
-\subsection{Model Specification}
+\subsection{Application-Specific State Specification}
 \label{subsec:specification}
 
 In our application, the evolution matrix \(\mathbf{G}_t\), introduced in \eqref{A2} and also used in \eqref{B4}, is composed of a trend component and a seasonal component. For the trend component, we include a constant term to represent the long-term average level of the quantile of interest. This component is defined by the evolution matrix and observational vector:
@@ -324,11 +310,28 @@ For prior hyperparameters (see Subsection~\ref{subsec:prioranddisc}), we specify
 
 We choose discount factors componentwise to reflect each component’s time scale and role. Recall that, in the discount–factor formulation \citep{prado2021time}, a smaller discount factor value  \(d\in(0,1]\) for a given state parameter implies larger state–evolution variance and hence greater adaptability of that component. We use component discounting. More specifically, we set a static local level with a discount factor \(d_{\text{trend}}=1\), so the trend behaves effectively as a constant. For seasonality, we favor high persistence across all harmonics—yearly, semestral, and the 80-month cycle—using a common value \(d_{\text{seas}}=0.9997\). This guards against overreacting to short–term fluctuations while allowing slow adjustment of amplitude and phase consistent with multi-year variability and occasional structural changes (e.g., modification on local infrastructure). For the discrepancy states, we use \(d_{\text{disc}}=0.999\), providing modest flexibility to adapt for non-systematic differences between the retrospective analysis and the observations across wet and dry regimes. The covariate effects in~\eqref{A4} remain static with discount factors of 1. Finally,  the transfer rate is set to \(\lambda=0.8995\), obtained by optimizing one-step-ahead CRPS with the above discount factors held fixed. These choices aim to be consistent with the intended time scales of each component; in our experiments, discount factor values above 0.9997 for the seasonal components and above to 0.999 for the discrepancies led to qualitatively similar results while the selected settings offered stable, interpretable dynamics. Lower discount factor values resulted in seasonal components that were too volatile and hard to interpret, while lower discount factors for the discrepancies led to crossing of the quantiles, which we want to avoid. 
 
+\subsection{Rolling-Origin Forecast Evaluation Design}
 
-\subsection{General Results}
-\label{sec:results}
+For the forecasting evaluation, we use five rolling-origin cutoff dates that span contrasting hydrological conditions while remaining compatible with the archived forecast products available from each agency. At each cutoff, the model is fit using USGS observations and retrospective products available through that date. Forecasts are then generated over the subsequent forecast window using the latest forecast products issued at or before the cutoff. Candidate specifications differ in whether the transfer component remains active during that window, but post-cutoff USGS observations are reserved for verification and are not used to fit or update the predictive distributions.
 
- For our analysis, we target the dynamics of seven different quantiles, namely, \textbf{0.05}, \textbf{0.2}, \textbf{0.35}, \textbf{0.5}, \textbf{0.65}, \textbf{0.8}, and \textbf{0.95}. We present the results obtained under the variational Bayes implementation, for which optimal discount factors and transfer rate parameters were computed independently for each model in parallel. 
+GloFAS issues forecasts daily, whereas NWS issues them hourly. To maintain temporal consistency across sources, we aggregate the NWS products to daily resolution and then retain only the most recent daily forecast available at each cutoff. Figure~\ref{fig:ensembles} illustrates this information structure for the representative cutoff on December 25, 2022. The GloFAS forecast products extend from December 25, 2022 to January 22, 2023, while the NWS forecast products extend from December 25, 2022 to January 5, 2023. The USGS series before the cutoff is used for fitting, and the post-cutoff USGS values are used only to verify the forecast window.
+
+\begin{figure*}[hbt!]
+\centering
+\centerline{\includegraphics[width=450pt]{DISC/forecats.png}}
+\caption{
+\textbf{Before 2022-12-26:} Green—USGS observations; Purple—NWS retrospective analysis; Orange—GloFAS retrospective analysis. \textbf{From 2022-12-26 onward:} Red—future USGS observations used only for verification; Purple—NWS 7-member forecast product, covering 2022-12-25 to 2023-01-05; Orange—GloFAS 51-member forecast product, covering 2022-12-25 to 2023-01-22. Horizontal dashed lines indicate official flood stages for the river.
+}
+\label{fig:ensembles}
+\end{figure*}
+
+\section{FORECAST VALIDATION RESULTS}
+\label{sec:forecastvalidation}
+
+\subsection{Comparative Forecasting Performance Across Model Families}
+\label{subsec:benchmarkresults}
+
+For our analysis, we target the dynamics of seven different quantiles, namely, \textbf{0.05}, \textbf{0.2}, \textbf{0.35}, \textbf{0.5}, \textbf{0.65}, \textbf{0.8}, and \textbf{0.95}. We present the results obtained under the variational Bayes implementation, for which optimal discount factors and transfer-rate parameters were computed independently for each model in parallel.
 
 Before turning to parameter-level summaries for the reference specification, we compare forecast-window skill across all candidate model families and the raw forecast-product baselines. All nine Bayesian alternatives share the same linear dynamic backbone (trend, seasonal, and transfer-function components) and Gaussian state evolution; they differ in the observation likelihood and in whether external retrospective/forecast information from climate institutions is incorporated during the forecast window. We use the compact label \(L\)-\(S\)-\(T\): \(L\in\{\mathrm{N},\mathrm{AL},\mathrm{exAL}\}\), where N denotes the Normal Dynamic Linear Model (NDLM), AL denotes the Dynamic Quantile Linear Model with asymmetric Laplace likelihood, and exAL denotes the extended DQLM with extended asymmetric Laplace likelihood; \(S\in\{\mathrm{U},\mathrm{M}\}\), where U is univariate and M is multivariate; and \(T\in\{\mathrm{T0},\mathrm{T1}\}\), where T0 indicates that the transfer function is inactive during the forecast window and T1 indicates that it remains active during the forecast window. We also report the raw GloFAS and NWS forecast-product baselines.
 
@@ -360,6 +363,11 @@ exAL-M-T1 & \textbf{0.1295} & \textbf{0.0201} & \textbf{0.2830} & \textbf{0.0165
 \end{table*}
 
 Table~\ref{tab:benchmark_crps_models} shows a clear ranking pattern. The two multivariate synthesis models with transfer function active during the forecast window (AL-M-T1 and exAL-M-T1) dominate the comparison. Under the comparison reported here, exAL-M-T1 is the best-performing model in all five cutoffs, with AL-M-T1 remaining the closest competitor and particularly close at 01/23/2021 and 05/11/2022. In all five cutoffs, the best Bayesian corrected model outperforms the best raw forecast-product baseline. This comparison highlights the value of combining retrospective analyses and ensemble forecasts within the synthesis framework, and it motivates our detailed focus below on the exAL specification as the most consistently strong model across cutoffs.
+
+\section{INTERPRETATION OF THE SELECTED SPECIFICATION}
+\label{sec:interpretation}
+
+\subsection{Source-Specific Shape and Scale Parameters}
 
 \begin{table*}[htbp]
 \caption{Posterior Medians and 95\% Credible Intervals for $\gamma$ by Source and Quantile Level}
@@ -435,6 +443,8 @@ Tables~\ref{tab:gamma_sigma_intervals1} and \ref{tab:gamma_sigma_intervals2} rep
 
 For \(\sigma\), which measures residual dispersion of the quantile fit (and not the intrinsic quality of a product), we observe that NWS tends to have the largest \(\sigma\) at lower and central quantiles (e.g., 0.05–0.65), GLOFAS is often the smallest over 0.05–0.80 but becomes the largest at the 0.95 quantile, and USGS typically lies in between (e.g., slightly larger than GLOFAS around the median, but smaller than GLOFAS at the 0.95 quantile). Credible intervals across sources are largely distinct (with limited overlap at a few central quantiles), reinforcing the need for source-specific \((\gamma,\sigma)\) parameters. Overall, the updated estimates align with a coherent picture in which residual asymmetry and dispersion meaningfully differ by source and vary across quantiles, and our specification captures these differences explicitly.
 
+\subsection{Historical Behavior Across Representative Regimes}
+
 For clarity, we focus further analysis on the 5th, 50th, and 95th quantiles, comparing model dynamics during the 2012–2016 drought and the 2017–2019 wet period to assess performance under contrasting hydrological regimes.
 
 \begin{figure}[h]
@@ -473,6 +483,8 @@ Figures~\ref{fig:dry_quantile} and \ref{fig:rainy_quantile} show posterior means
 Credible bands around each individual quantile are relatively tight and stable overall, consistent with the long sample and the model’s linear dynamics. The quantile range (Q95–Q05), however, is adaptive to the different periods: it narrows during the dry period (2012–2016) and rain–free months, and widens in the wet period (2017–2019) and during late–fall/early–winter events. This widening during high–flow episodes suggests the model allocates more uncertainty when flows are volatile, aligning with precipitation–driven variability.
 
 No quantile crossing was observed in our results, despite fitting models independently for each quantile. However, quantile crossing can still occur, particularly in smaller samples or with more volatile data. If this becomes a concern, joint model selection approaches that impose non-crossing constraints could be considered to ensure the monotonicity of quantile estimates.
+
+\subsection{Covariate Effects}
 
 \begin{table*}[htbp]
 \centering
@@ -516,7 +528,7 @@ Overall, the increase of both precipitation and soil–moisture effects toward t
 
 
 \subsection{Posterior Predictive Synthesis}
-\label{subsec\:synthesis}
+\label{subsec:synthesis}
 
 To obtain a single predictive distribution from several quantile-specific posterior models, we synthesize their posterior predictive quantiles into one quantile function.
 

@@ -595,7 +595,7 @@ Goal: fix the architecture that Reviewer 1 found confusing.
   - Current problem area: `247-610`
   - Final blueprint recorded in Section 4 of this checklist
 
-- [ ] Introduce USGS observations earlier and more explicitly as the target series.
+- [x] Introduce USGS observations earlier and more explicitly as the target series.
   - Source: `R1-m4`
   - Current locations: `250-290`
 
@@ -607,7 +607,7 @@ Goal: fix the architecture that Reviewer 1 found confusing.
   explicit and early.
   - Source: `R1-m4`, `HE-6`
 
-- [ ] Replace the vague subsection title `General Results`.
+- [x] Replace the vague subsection title `General Results`.
   - Source: `R1-m7`
   - Current location: `350`
 
@@ -733,8 +733,8 @@ Use this as the working order when actually editing the manuscript.
 ### Third pass: introduction and section architecture
 - [x] introduction rewritten
 - [x] section architecture decided
-- [ ] data/application ordering rewritten
-- [ ] `General Results` renamed/replaced
+- [x] data/application ordering rewritten
+- [x] `General Results` renamed/replaced
 
 ### Fourth pass: forecasting protocol and validation
 - [ ] latest-forecast-only protocol in text
