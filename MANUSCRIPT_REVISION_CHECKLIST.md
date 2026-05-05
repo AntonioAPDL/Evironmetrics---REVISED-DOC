@@ -599,7 +599,7 @@ Goal: fix the architecture that Reviewer 1 found confusing.
   - Source: `R1-m4`
   - Current locations: `250-290`
 
-- [ ] Make the distinction among:
+- [x] Make the distinction among:
   - USGS observations,
   - retrospective products,
   - forecast products,
@@ -619,28 +619,28 @@ Goal: fix the architecture that Reviewer 1 found confusing.
 ### Phase E. Forecast protocol rewrite
 Goal: align the manuscript with the revised final forecasting protocol.
 
-- [ ] Remove or rewrite the old weighted multi-issuance forecast aggregation protocol.
+- [x] Remove or rewrite the old weighted multi-issuance forecast aggregation protocol.
   - Source: `HE-7`, `R1-m6`
   - Current location: `293-300`
   - Replace with latest-forecast-only protocol.
 
-- [ ] Clarify that the forecasting evaluation is rolling-origin and out-of-sample.
+- [x] Clarify that the forecasting evaluation is rolling-origin and out-of-sample.
   - Source: `HE-2`, `HE-6`, `R1-M5`
 
-- [ ] State clearly what is available at each cutoff:
+- [x] State clearly what is available at each cutoff:
   - observed discharge through the cutoff,
   - retrospective products available through the cutoff,
   - forecast products issued at or before the cutoff,
   - forecast covariates available at the cutoff.
   - Source: `HE-6`
 
-- [ ] State clearly that post-cutoff USGS observations are used only for verification.
+- [x] State clearly that post-cutoff USGS observations are used only for verification.
   - Source: `HE-6`
 
 - [ ] Decide where to place the explanation for why only five cutoffs were retained.
   - Source: `HE-2` TODO pending Raquel
 
-- [ ] Make the cross-validation logic explicit as rolling-origin cutoff-based folds.
+- [x] Make the cross-validation logic explicit as rolling-origin cutoff-based folds.
   - Source: `R1-M5`
 
 ### Phase F. Forecast validation/results overhaul
@@ -738,9 +738,9 @@ Use this as the working order when actually editing the manuscript.
 - [x] methods reframed around one unified framework
 
 ### Fourth pass: forecasting protocol and validation
-- [ ] latest-forecast-only protocol in text
-- [ ] five-cutoff rolling-origin design stated clearly
-- [ ] fit-time vs forecast-time vs verification distinction stated clearly
+- [x] latest-forecast-only protocol in text
+- [x] five-cutoff rolling-origin design stated clearly
+- [x] fit-time vs forecast-time vs verification distinction stated clearly
 - [ ] benchmark comparison fully aligned with rebuttal
 - [ ] supplement/appended placement for ablation and quantile diagnostics finalized
 
