@@ -476,13 +476,13 @@ If a later manuscript change conflicts with any of these five points, revisit th
 
 Use this order when the large section rewrite begins.
 
-### Stage 1. Replace the section skeleton first
+### Stage 1. Replace the section skeleton first [completed]
 - update the roadmap sentence in the introduction only after the new section map is in place
 - replace the current combined Section 3 plan with the new Section 3 / Section 4 / Section 5 split
 - remove `General Results`
 - create the new subsection headings before rewriting local prose
 
-### Stage 2. Rebuild the methods around one framework
+### Stage 2. Rebuild the methods around one framework [completed]
 - replace the `Model A / B / C` presentation with:
   - shared latent quantile process
   - source-specific observation equations
@@ -735,6 +735,7 @@ Use this as the working order when actually editing the manuscript.
 - [x] section architecture decided
 - [x] data/application ordering rewritten
 - [x] `General Results` renamed/replaced
+- [x] methods reframed around one unified framework
 
 ### Fourth pass: forecasting protocol and validation
 - [ ] latest-forecast-only protocol in text
