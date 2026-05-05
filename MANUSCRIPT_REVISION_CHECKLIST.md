@@ -57,14 +57,12 @@ Main issues already acknowledged in the rebuttal:
 - mixes meteorological and hydrological uncertainty too early
 - overemphasizes ensemble-generation details relative to the actual paper contribution
 - still frames part of the contribution too broadly as dynamical error correction
-- needs to mention conceptual as well as physically based hydrological models
 
 ### Methodology
 Current location:
 - `wileyNJD-APA.tex:78-245`
 
 Main issues already acknowledged:
-- `Flexile` typo in subsection title (`83`)
 - PIT discussion is too long and should be removed from the main text (`216-245`)
 - posterior predictive synthesis section is too long and too technical (`540-610`)
 - quantile-crossing correction is developed at dissertation-level detail, even though no crossing occurs in the application
@@ -78,8 +76,6 @@ Main issues already acknowledged:
 - current paper still contains the old single-event framing and weighted multi-issuance forecast aggregation (`293-300`)
 - `General Results` heading is too vague (`350`)
 - current figure pair (`fig:synth1`, `fig:synth2`) still reflects the old illustrative setup and may need replacement or reframing
-- Table 1 / Table 2 captions still say posterior mean while text says posterior medians (`387`, `422`, `456`)
-- raw baseline terminology still says `Raw physical ensembles` in places (`355`, `384`)
 
 ### Conclusions
 Current location:
@@ -292,27 +288,27 @@ This order is designed to reduce risk and keep the rebuttal and manuscript synch
 ### Phase A. Fast factual/editorial fixes
 Goal: clean low-risk issues first.
 
-- [ ] Fix `Flexile` -> `Flexible` in the subsection title.
+- [x] Fix `Flexile` -> `Flexible` in the subsection title.
   - Source: `R1-m2`
   - Current location: `83`
 
-- [ ] Update the introduction sentence on hydrological models to include conceptual models.
+- [x] Update the introduction sentence on hydrological models to include conceptual models.
   - Source: `R1-m1`
   - Current location: `62`
 
-- [ ] Replace deterministic language around retrospective/reanalysis products and note ERA5 forecast components explicitly.
+- [x] Replace deterministic language around retrospective/reanalysis products and note ERA5 forecast components explicitly.
   - Source: `R1-m3`
   - Current locations: `250-290`, especially data/product descriptions
 
-- [ ] Fix Table 1 and Table 2 captions/notes so they consistently say posterior medians where appropriate.
+- [x] Fix Table 1 and Table 2 captions/notes so they consistently say posterior medians where appropriate.
   - Source: `R1-m8`
   - Current locations: `387`, `422`, text at `456`
 
-- [ ] Normalize baseline terminology in the manuscript to `raw forecast products` or another final consistent term.
+- [x] Normalize baseline terminology in the manuscript to `raw forecast products` or another final consistent term.
   - Source: final rebuttal cleanup and `HE-2`
   - Current locations: `355`, `384`, any table captions/text that still say `raw physical ensembles`
 
-- [ ] Add/clarify code availability and reproducibility statement.
+- [x] Add/clarify code availability and reproducibility statement.
   - Source: `HE-5`
   - Likely location: acknowledgments / data-availability / supplementary note area
 
@@ -489,12 +485,12 @@ Goal: only after the body is stable.
 Use this as the working order when actually editing the manuscript.
 
 ### First pass: low-risk manuscript fixes
-- [ ] `Flexile` -> `Flexible`
-- [ ] conceptual-model wording in introduction
-- [ ] ERA5 / retrospective wording precision
-- [ ] Table 1 / Table 2 caption fixes
-- [ ] baseline terminology normalization
-- [ ] code/reproducibility note
+- [x] `Flexile` -> `Flexible`
+- [x] conceptual-model wording in introduction
+- [x] ERA5 / retrospective wording precision
+- [x] Table 1 / Table 2 caption fixes
+- [x] baseline terminology normalization
+- [x] code/reproducibility note
 
 ### Second pass: delete/shorten obvious excess
 - [ ] PIT section from main text
