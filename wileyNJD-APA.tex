@@ -80,112 +80,91 @@ We first introduce some notation to be used throughout the article. We use bold 
 The use of the Asymmetric Laplace (AL) distribution for quantile inference within a Bayesian framework is well-established with both empirical and theoretical justifications \citep{yu2001bayesian, sriram2013theoretical}. We use a recent extension of the AL distribution, which we refer to as the extended asymmetric Laplace (exAL), that addresses intrinsic issues for the AL working likelihood, such as the limitations imposed by its skewness. \citet{yan2025new} proposed the extended asymmetric Laplace (exAL) distribution, $\text{exAL}_{p_0}(\mu, \sigma, \gamma)$, where $\mu$ represents the $p_0$th quantile of interest, $\sigma$ is a positive scale parameter, and $\gamma$ is the skewness parameter. Moreover, the parameter $\gamma$ has bounded support over the interval $(L, U)$, where $L$ is the negative root of $g(\gamma) = 1 - p_0$ and $U$ is the positive root of $g(\gamma) = p_0$, with $g(\gamma) = 2 \Phi(-|\gamma|) \exp(\gamma^2 / 2)$ and $\Phi$ denoting the standard normal CDF. To improve the efficiency of our posterior sampling algorithms, we utilize the extended stochastic representation of an exAL random variable described in \citet{yan2025new}. That is, if $y \sim \text{exAL}(\mu, \sigma, \gamma)$, then there exist independent random variables $\epsilon \sim \mathcal{N}(0, 1)$, $z \sim \text{Exp}(1)$, and $s \sim \mathcal{N}^+(0, 1)$, (where $\mathcal{N}^+(0, 1)$ denotes the standard normal distribution truncated to the positive real line), such that  \( y = \mu + C(\gamma; p_0)\sigma |\gamma| s + A(\gamma; p_0) \sigma z + \sqrt{B(\gamma; p_0) \sigma^2 z} \cdot \epsilon, \) where $A(\gamma; p_0) = \frac{1 - 2 p(\gamma; p_0)}{p(\gamma; p_0) \, [1 - p(\gamma; p_0)]}$, $B(\gamma; p_0) = \frac{2}{p(\gamma; p_0) \, [1 - p(\gamma; p_0)]}$, $C(\gamma; p_0) = [I(\gamma > 0) - p(\gamma; p_0)]^{-1}$, and $p(\gamma; p_0) = I(\gamma < 0) + \{p_0 - I(\gamma < 0)\} / g(\gamma)$.
 
 
-\subsection{Shared Latent Quantile Process}
-\label{sec:dqlm}
-
-We model the target quantile process with an extended Dynamic Quantile Linear Model (exDQLM), introduced by \citet{barata2021_flex_quantile}. The model combines a latent quantile process for river flow with a transfer-function component for external covariates. For \( 1 \leq t \leq T \), we write
-\begin{align}
-      \text{USGS observations}:&& y^o_t | \boldsymbol{\theta}_t, \zeta_t, \sigma^o, \gamma^o &\sim \text{exAL}_{p_0} \Big( \mathbf{F}'_t \boldsymbol{\theta}_t + \zeta_t, \sigma^o, \gamma^o \Big) \label{A1} \\
-    \text{Trend and Seasonal States}:&& \boldsymbol{\theta}_t | \boldsymbol{\theta}_{t-1} &\sim \mathcal{N} \Big( \mathbf{G}_t \boldsymbol{\theta}_{t-1}, \mathbf{W}^\theta_t \Big) \label{A2} \\
-    \text{Transfer State}:&& \zeta_t | \zeta_{t-1}, \bm{\psi}_t &\sim \mathcal{N} \Big( \lambda \zeta_{t-1} + \mathbf{x}'_t \boldsymbol{\psi}_t, \text{w}^\zeta_t \Big) \label{A3} \\
-    \text{Covariate-Effect States}:&& \boldsymbol{\psi}_t | \boldsymbol{\psi}_{t-1} &\sim \mathcal{N} \Big( \boldsymbol{\psi}_{t-1}, \mathbf{W}^\psi_t \Big). \label{A4}
-\end{align} 
-
-\noindent Here, $T$ denotes the length of the estimation period, $y^o_t \in {\mathbb{R}}$ denotes the observed river flow at time $t$, $\mathbf{F}_t \in {\mathbb{R}^{p}}$ denotes the observational vector, and $\boldsymbol{\theta}_t \in {\mathbb{R}^{p}}$ denotes the latent state vector. The term $\mathbf{F}'_t \boldsymbol{\theta}_t + \zeta_t$ defines the $p_0$th quantile for the USGS series, with $\boldsymbol{\theta}_t$ governing trend and seasonal dynamics and $\zeta_t$ collecting the accumulated effect of external covariates $\mathbf{x}_t \in {\mathbb{R}^{m}}$. The time-varying covariate coefficients are stored in $\boldsymbol{\psi}_t \in {\mathbb{R}^{m}}$, and the scalar $\lambda$ controls persistence in the transfer component. The source-specific scale and skewness parameters are denoted by $\sigma^o > 0$ and $\gamma^o \in [L,U]$, where the bounds depend on $p_0$ as defined above.
-
-Stacking the latent process into a single state vector gives the compact representation
-\begin{align}
-    \text{USGS observations}:&& y^o_t | \boldsymbol{\alpha}_t, \sigma^o, \gamma^o & \sim exAL_{p_0} \Big( \Tilde{\mathbf{F}}'_t \boldsymbol{\alpha}_t, \sigma^o, \gamma^o \Big) \label{A5} \\
-    \text{All States}:&& \boldsymbol{\alpha}_t | \boldsymbol{\alpha}_{t-1} &\sim \mathcal{N} \Big( \Tilde{\mathbf{G}}_t \boldsymbol{\alpha}_{t-1}, \Tilde{\mathbf{W}}_t \Big), \label{A6} 
-\end{align} 
-where,  \( \, \boldsymbol{\alpha}_t = \begin{bmatrix} 
-        \boldsymbol{\theta}_t \\ \zeta_t \\ \boldsymbol{\psi}_t 
-    \end{bmatrix},  \) \,  
-    \( \Tilde{\mathbf{F}}_t = \begin{bmatrix} 
-        \mathbf{F}_t \\ \mathbf{F}^{\text{trans}}_t 
-    \end{bmatrix}, \) \, 
-    \( \mathbf{F}^{\text{trans}}_t = \begin{bmatrix}
-        1 \\ \mathbf{0}_{m}
-    \end{bmatrix},  \) \,  
-    \( \Tilde{\mathbf{G}}_t = \text{BlockDiag} \Big( \mathbf{G}_t, \mathbf{G}^{\text{trans}}_t \Big), \, \) 
-    \( \mathbf{G}^{\text{trans}}_t = \begin{bmatrix}
-        \lambda & \mathbf{x}'_t \\
-        \mathbf{0}_{m} & \mathbf{I}_m
-    \end{bmatrix}, \) \, 
-    \newline 
-    and \( \, \Tilde{\mathbf{W}}_t = \text{BlockDiag} \Big( \mathbf{W}^\theta_t, \text{w}^\zeta_t, \mathbf{W}^\psi_t \Big). \)
-    
-\subsection{Source-Specific Observation Equations}
+\subsection{Full State-Space Specification}
 \label{subsec:retrospective}
 
-Retrospective products are single-valued hydrological reconstructions obtained by repeatedly applying a forecasting and data-assimilation system over a historical period. They are not observations, but they are typically more temporally consistent than real-time forecast products and are therefore useful for bias correction and post-processing. We treat each retrospective series as a source-specific view of the same latent river-flow quantile process.
+We present the full model directly and then describe its components. For the estimation period \(1 \leq t \leq T\), let
+\[
+\boldsymbol{\mu}_t =
+\begin{bmatrix}
+\boldsymbol{\theta}_t \\
+\boldsymbol{\delta}_t^1 \\
+\vdots \\
+\boldsymbol{\delta}_t^J \\
+\zeta_t \\
+\boldsymbol{\psi}_t
+\end{bmatrix},
+\]
+where \(\boldsymbol{\theta}_t \in \mathbb{R}^p\) contains the trend and seasonal states, \(\boldsymbol{\delta}_t^j \in \mathbb{R}^p\) is the discrepancy state for source \(j\), \(\zeta_t \in \mathbb{R}\) is the transfer state, and \(\boldsymbol{\psi}_t \in \mathbb{R}^m\) contains the time-varying covariate effects. The transfer block evolves through
+\[
+\mathbf{G}^{\text{trans}}_t =
+\begin{bmatrix}
+\lambda & \mathbf{x}_t' \\
+\mathbf{0}_m & \mathbf{I}_m
+\end{bmatrix},
+\]
+with \(\lambda\) governing persistence in the transfer state and \(\mathbf{x}_t\) denoting the external covariates.
 
-To incorporate \(J \geq 1\) retrospective products, we augment \eqref{A5}--\eqref{A6} as follows:
+The USGS observations and the retrospective products are treated as source-specific views of the same latent quantile process:
 \begin{align}
-      \text{USGS observations}:&& y^o_t | \boldsymbol{\alpha}_t, \sigma^o, \gamma^o &\sim exAL_{p_0} \Big( \Tilde{\mathbf{F}}'_t \boldsymbol{\alpha}_t, \sigma^o, \gamma^o \Big) \label{B1}  \\
-    \text{Retrospective}:&& z^j_t | \boldsymbol{\alpha}_t, \boldsymbol{\delta}^j_t, \sigma^j, \gamma^j &\sim exAL_{p_0} \Big( \Tilde{\mathbf{F}}'_t \boldsymbol{\alpha}_t + \mathbf{F}'_t \boldsymbol{\delta}^j_t, \sigma^j, \gamma^j \Big), \quad 1 \leq j \leq J \label{B2} \\
-    \text{Latent process states}:&&\boldsymbol{\alpha}_t | \boldsymbol{\alpha}_{t-1} &\sim \mathcal{N} \Big( \Tilde{\mathbf{G}}_t \boldsymbol{\alpha}_{t-1}, \Tilde{\mathbf{W}}_t \Big) \label{B3}\\
-    \text{Discrepancy States}:&& \boldsymbol{\delta}^j_t | \boldsymbol{\delta}^j_{t-1} &\sim \mathcal{N} \Big( \mathbf{G}_t \boldsymbol{\delta}^j_{t-1}, \mathbf{W}^{\delta^j}_t \Big), \quad 1 \leq j \leq J. \label{B4}
-\end{align} 
-Here, \( z^{j}_t \in {\mathbb{R}} \) denotes the retrospective product from agency \(j\) at time \(t\), and \(\boldsymbol{\delta}^j_t \in {\mathbb{R}}^{p}\) denotes its discrepancy state vector. The shared term \( \Tilde{\mathbf{F}}'_t \boldsymbol{\alpha}_t \) is the \(p_0\)th quantile for the USGS series, whereas \( \Tilde{\mathbf{F}}'_t \boldsymbol{\alpha}_t+\mathbf{F}'_t \boldsymbol{\delta}^j_t \) is the corresponding quantile for retrospective source \(j\). The discrepancy states allow each source to depart from the latent river-flow process in a structured way through time, rather than through a single static bias term. This yields a more interpretable description of regime-dependent source differences and provides the dynamic correction carried into the forecast window. We also assign source-specific scale and skewness parameters \((\sigma^j,\gamma^j)\), since the retrospective systems are generated by different models and post-processing pipelines. Related discrepancy-based forecast-combination strategies appear in \citet{salazar2011comparing,beltran,lemos2009spatio}.
-
-Stacking the latent and discrepancy states gives
-\begin{align}
-     \text{USGS observations}:&& y^o_t | \boldsymbol{\mu}_t, \sigma^o, \gamma^o &\sim exAL_{p_0} \Big( \textbf{h}_{t,1}' \boldsymbol{\mu}_t, \sigma^o, \gamma^o \Big) \\ \label{B5}
-    \text{Retrospective}:&& z^j_t | \boldsymbol{\mu}_t, \sigma^j, \gamma^j &\sim exAL_{p_0} \Big( \textbf{h}_{t,j+1}' \boldsymbol{\mu}_t, \sigma^j, \gamma^j \Big), \quad 1 \leq j \leq J \\ \label{B6}
-    \text{All states}:&& \boldsymbol{\mu}_t | \boldsymbol{\mu}_{t-1} &\sim \mathcal{N} \Big( \boldsymbol{D}_t \boldsymbol{\mu}_{t-1}, \boldsymbol{\Lambda}_t \Big),  \label{B7}
-\end{align} 
-where, \(  \boldsymbol{\mu}_t = \begin{bmatrix} \boldsymbol{\theta}_t \\ \boldsymbol{\delta}_t \\ \zeta_t \\ \boldsymbol{\psi}_t \end{bmatrix}, \,
-\textbf{H}_t &= \begin{bmatrix} 
-    \mathbf{F}_t & \begin{bmatrix} \mathbf{F}_t \stackrel{J \; \text{times}}{\dots} \mathbf{F}_t \end{bmatrix} \\
-    \mathbf{0}_{pJ} &  \text{BlockDiag} \big( \mathbf{F}_t, \stackrel{J \; \text{times}}{\dots}, \mathbf{F}_t  \big) \\
-    1 & \mathbf{1}_{J}' \\
-    0 & \mathbf{0}_{J}'
-\end{bmatrix}, \,
-\boldsymbol{D}_t = \text{BlockDiag} \Big( \mathbf{G}_t, \stackrel{J+1 \; \text{times}}{\dots}, \mathbf{G}_t, \mathbf{G}^{\text{trans}}_t \Big), \newline
-\boldsymbol{\Lambda}_t = \text{BlockDiag} \Big( \mathbf{W}^\theta_t, \mathbf{W}^{\delta^1}, \dots, \mathbf{W}^{\delta^J}_t, w^\zeta_t, \mathbf{W}^{\boldsymbol{\psi}}_t \Big) 
-\). Here, $\textbf{h}_{t,k}$ denotes the \(k\)th column of \(\mathbf{H}_t\), and \( \boldsymbol{\delta}_t \in {\mathbb{R}}^{pJ} \) denotes the concatenation of the \(J\) discrepancy vectors at time \(t\). We assume conditional independence between \( y^o_t \) and the retrospective products, as well as across retrospective products, given the latent states. A correlated extension is possible through the multivariate exDQLM formulation of \citet{barata2021dqlm}, but we do not pursue that extension here.
+     \text{USGS observations}:&& y^o_t \mid \boldsymbol{\mu}_t, \sigma^o, \gamma^o &\sim \text{exAL}_{p_0}\!\left(\mathbf{h}_{t,0}' \boldsymbol{\mu}_t, \sigma^o, \gamma^o\right), \label{B5} \\
+    \text{Retrospective products}:&& z^j_t \mid \boldsymbol{\mu}_t, \sigma^j, \gamma^j &\sim \text{exAL}_{p_0}\!\left(\mathbf{h}_{t,j}' \boldsymbol{\mu}_t, \sigma^j, \gamma^j\right), \quad 1 \leq j \leq J, \label{B6} \\
+    \text{All states}:&& \boldsymbol{\mu}_t \mid \boldsymbol{\mu}_{t-1} &\sim \mathcal{N}\!\left(\boldsymbol{D}_t \boldsymbol{\mu}_{t-1}, \boldsymbol{\Lambda}_t\right). \label{B7}
+\end{align}
+Here,
+\[
+\mathbf{h}_{t,0} =
+\begin{bmatrix}
+\mathbf{F}_t \\
+\mathbf{0}_{pJ} \\
+1 \\
+\mathbf{0}_m
+\end{bmatrix},
+\qquad
+\mathbf{h}_{t,j} =
+\begin{bmatrix}
+\mathbf{F}_t \\
+\mathbf{0}_{p(j-1)} \\
+\mathbf{F}_t \\
+\mathbf{0}_{p(J-j)} \\
+1 \\
+\mathbf{0}_m
+\end{bmatrix},
+\quad 1 \le j \le J,
+\]
+so the USGS mean is the latent quantile \(\mathbf{F}_t' \boldsymbol{\theta}_t + \zeta_t\), whereas the \(j\)th retrospective source adds its discrepancy term \(\mathbf{F}_t' \boldsymbol{\delta}_t^j\). The state evolution matrix and covariance are
+\[
+\boldsymbol{D}_t = \text{BlockDiag}\!\left(\mathbf{G}_t, \mathbf{G}_t, \ldots, \mathbf{G}_t, \mathbf{G}^{\text{trans}}_t\right),
+\]
+with \(\mathbf{G}_t\) repeated once for the latent trend/seasonal block and once for each discrepancy block, and
+\[
+\boldsymbol{\Lambda}_t = \text{BlockDiag}\!\left(\mathbf{W}^{\theta}_t, \mathbf{W}^{\delta^1}_t, \ldots, \mathbf{W}^{\delta^J}_t, w_t^{\zeta}, \mathbf{W}^{\psi}_t\right).
+\]
+This formulation makes the main components explicit: a shared latent quantile process, source-specific discrepancy dynamics, and a transfer block driven by external covariates. The earlier observation-only and retrospective-only formulations are nested restrictions of \eqref{B5}--\eqref{B7}: suppressing the discrepancy states recovers the observation-only exDQLM, and restricting attention to \(t \leq T\) gives the retrospective-correction model.
 
 \subsection{Forecast-Window Extension}
 \label{subsec:ensemble}
 
-Ensemble forecast products are real-time predictive datasets generated by climate and hydrological agencies from the information available at a forecast origin. Each ensemble member represents one plausible future trajectory, so the ensemble provides a source-specific description of forecast uncertainty over the post-cutoff window.
+Ensemble forecast products are real-time predictive datasets generated from the information available at a forecast origin. Each ensemble member represents one plausible future trajectory, so after the cutoff the same state-space framework is continued forward by replacing the retrospective channels with forecast-product channels.
 
-We extend the framework beyond the forecast origin \(T\) by linking the latent process to ensemble forecast products. Let \(K_{(j)}\) denote the horizon length of the products issued by forecaster \(j\), ordered so that \(K_{(1)} \geq \ldots \geq K_{(J)}\). Suppose forecaster \(j\) provides \(I_j \geq 1\) ensemble members, and let \(y^{j,i}_T(k) \in {\mathbb{R}}\) denote member \(i\) from forecaster \(j\), issued at time \(T\) for lead \(k\). For \(t > T\), \(1 \leq j \leq J\), \(1 \leq i \leq I_j\), and \(1 \leq k \leq K_{(j)}\), we use
-\begin{align} 
-    \text{Forecasts }:&& y^{j,i}_T(k) | \boldsymbol{\beta}_{T+k}, \sigma^j, \gamma^j &\sim exAL_{p_0} \Big( \textbf{e}_{T+k,j+1}' \boldsymbol{\beta}_{T+k}, \, \sigma^j, \, \gamma^j \Big) \\ \label{C1}
-    \text{Forecast-window States}:&& \boldsymbol{\beta}_{T+k} | \boldsymbol{\beta}_{T+k-1} &\sim \mathcal{N} \Big( \textbf{M}_{T+k} \boldsymbol{\beta}_{T+k-1}, \, \mathbf{W}_{T+k} \Big),  \label{C2} \\
-    \text{Stochastic Covariance}:&& \mathbf{W}_{T+k} &\sim \text{InvWishart}(\nu_{T+k}, S_{T+k})
+Let \(K_{(j)}\) denote the horizon length of forecaster \(j\), ordered so that \(K_{(1)} \ge \cdots \ge K_{(J)}\). If forecaster \(j\) provides \(I_j\) ensemble members and \(y_T^{j,i}(k)\) denotes member \(i\) issued at time \(T\) for lead \(k\), then for \(t=T+k\) and each source \(j\) with \(k \le K_{(j)}\),
+\begin{align}
+    \text{Forecast products}:&& y_T^{j,i}(k) \mid \boldsymbol{\mu}_{T+k}, \sigma^j, \gamma^j &\sim \text{exAL}_{p_0}\!\left(\mathbf{e}_{T+k,j}' \boldsymbol{\mu}_{T+k}, \sigma^j, \gamma^j\right), \label{C1} \\
+    \text{Forecast-window states}:&& \boldsymbol{\mu}_{T+k} \mid \boldsymbol{\mu}_{T+k-1} &\sim \mathcal{N}\!\left(\boldsymbol{M}_{T+k} \boldsymbol{\mu}_{T+k-1}, \mathbf{W}_{T+k}\right), \label{C2} \\
+    \text{Stochastic covariance}:&& \mathbf{W}_{T+k} &\sim \text{InvWishart}(\nu_{T+k}, S_{T+k}).
 \end{align}
-where, for the reduced forecast-window specification used in T0 and for \(T+1+K_{(j+1)} \leq t \leq T+K_{(j)}\),
-\(
-\boldsymbol{\beta}_t = \begin{bmatrix} 
-    \boldsymbol{\theta}_t \\ \boldsymbol{\delta}^f_t 
-\end{bmatrix}, \quad
-\boldsymbol{E}_t = \begin{bmatrix} 
-    \mathbf{F}_t \stackrel{j \;\; \text{times}}{\dots} \mathbf{F}_t \\ 
-    \text{BlockDiag} \big( \mathbf{F}_t, \stackrel{j \; \text{times}}{\dots}, \mathbf{F}_t  \big)
-\end{bmatrix}, \quad
-\textbf{M}_t = \text{BlockDiag} \Big( \mathbf{G}_t, \stackrel{j+1 \; \text{times}}{\dots}, \mathbf{G}_t  \Big).
-\)
-Here, \(\textbf{e}_{t,k}\) denotes the \(k\)th column of \(\boldsymbol{E}_t\). The Inverse Wishart parametrization is such that \( \mathbb{E}[\mathbf{W_t}] = \frac{\mathbf{S}_t}{\nu_t - p_t - 1} \), where \(\mathbf{S}_t\) is a positive definite scale matrix, \(\nu_t\) denotes the degrees of freedom, and \(p_t\) is the dimension of \(\boldsymbol{\beta}_t\) at time \(t\). The vector \(\boldsymbol{\delta}^f_t \in \mathbb{R}^{d_t}\) represents the vertical concatenation of the discrepancy state vectors for all forecasters that provide ensemble predictions at time \(t\). Explicitly,
-\(
-\boldsymbol{\delta}^f_t = \begin{bmatrix}
-\boldsymbol{\delta}_t^1 \\
-\vdots \\
-\boldsymbol{\delta}_t^j
-\end{bmatrix},
-\)
-where \(j\) reflects the number of forecasters with active ensemble forecasts at time \(t\), and \(d_t\) is the total dimension resulting from concatenating the corresponding vectors. We order the forecasters by decreasing forecast horizon to ensure that, for any given time \(t\), only those forecasters with available predictions are included in the model. This construction allows the state space to adapt dynamically as different forecasters' ensemble products become unavailable or expire over the forecast period.
+The vector \(\mathbf{e}_{T+k,j}\) is the forecast-window analogue of \(\mathbf{h}_{t,j}\): it extracts the latent trend/seasonal block, the discrepancy block for source \(j\), and, when active, the transfer block. The matrix \(\boldsymbol{M}_{T+k}\) propagates the same components forward into the forecast window. In the full specification used by exAL-M-T1, the transfer states \((\zeta_t,\boldsymbol{\psi}_t)\) remain active and the forecast covariates available at the cutoff are propagated through the transition block. The reduced T0 variant is obtained by suppressing this forecast-window transfer block after the cutoff.
 
-Equations \eqref{C1}--\eqref{C2} define the forecast-window state-space specification. In the application, we compare two forecast-window variants. In T0, \(\boldsymbol{\beta}_t\) contains only the trend, seasonal, and discrepancy states. In T1, \(\boldsymbol{\beta}_t\), \(\boldsymbol{E}_t\), and \(\boldsymbol{M}_t\) are augmented with the transfer states \((\zeta_t,\boldsymbol{\psi}_t)\), and forecast covariates available at the cutoff are propagated through the corresponding transition block. The empirical comparison therefore concerns two forecast-window variants of the same framework.
+For presentation, \eqref{B5}--\eqref{C2} define one model with time-dependent active observation channels. In implementation, we use reduced forecast-window vectors and matrices that retain only the forecasters with horizons still active at a given lead time. This reduced representation is computationally convenient, but it is algebraically equivalent to the single full framework presented here.
 
 \subsection{Prior Specification and Discount Factors}
 \label{subsec:prioranddisc}
 Following \citet{barata2021_flex_quantile}, for each skewness parameter, we assign a truncated Student-t prior: \(\gamma^j \sim t_{(L, U)}(0, \phi^j, \nu^j)\), where $\phi^j$ and $\nu^j$ denote the scale and degrees of freedom hyperparameters, respectively, for \(1 \leq j \leq J\). For the scale parameters, we use inverse gamma priors: \(\sigma^j \sim IG(a_{\sigma^j}, b_{\sigma^j})\), with $a_{\sigma^j}$ and $b_{\sigma^j}$ as shape and scale hyperparameters. The initial state is specified as \(\boldsymbol{\theta}_0 \sim \mathcal{N}(\mathbf{m}_0, \mathbf{C}_0)\), with $\mathbf{m}_0$ and $\mathbf{C}_0$ as location and scale hyperparameters.
 
-Discount factors \citep{prado2021time} are used for adaptive evolution of the covariance matrices at the state level. Discount factors lie in the $(0,1]$ range, with 1 indicating no dynamic evolution and smaller values implying greater temporal adaptability. We use component discounting. The application-specific choices are given in Subsection~\ref{subsec:specification}. During the forecasting period ($t \in \{T+1, \ldots, T+K\}$), we set the Inverse Wishart prior parameters as $\mathbf{S}_t = (\nu_t - p_t - 1)\, c\, \mathbf{W}_T$ and $\nu_t = (p_t + 1 + \epsilon)$, with $\epsilon, c > 0$. Under this specification, the posterior mean is  \(
-\mathbb{E}[\mathbf{W}_t \mid \mathcal{D}_t] = \frac{\epsilon}{1 + \epsilon}(c\, \mathbf{W}_T) + \frac{1}{1 + \epsilon} \mathbb{E}\left[ (\boldsymbol{\beta}_t - \mathbf{M}_t \boldsymbol{\beta}_{t-1}) (\boldsymbol{\beta}_t - \mathbf{M}_t \boldsymbol{\beta}_{t-1})' \mid \mathcal{D}_t \right], \)  
+Discount factors \citep{prado2021time} are used for adaptive evolution of the covariance matrices at the state level. Discount factors lie in the $(0,1]$ range, with 1 indicating no dynamic evolution and smaller values implying greater temporal adaptability. We use component discounting. The application-specific choices are given in Subsection~\ref{subsec:specification}. During the forecasting period ($t \in \{T+1, \ldots, T+K\}$), we set the Inverse Wishart prior parameters as $\mathbf{S}_t = (\nu_t - p_t - 1)\, c\, \mathbf{W}_T$ and $\nu_t = (p_t + 1 + \epsilon)$, with $\epsilon, c > 0$. Under this specification, the posterior mean is
+\(
+\mathbb{E}[\mathbf{W}_t \mid \mathcal{D}_t] = \frac{\epsilon}{1 + \epsilon}(c\, \mathbf{W}_T) + \frac{1}{1 + \epsilon} \mathbb{E}\left[ (\boldsymbol{\mu}_t - \mathbf{M}_t \boldsymbol{\mu}_{t-1}) (\boldsymbol{\mu}_t - \mathbf{M}_t \boldsymbol{\mu}_{t-1})' \mid \mathcal{D}_t \right],
+\)
 where $\mathcal{D}_t$ denotes all data available up to and including time $t$.
 
 This specification yields a convex combination between a scaled version of the last covariance learned from observed data, $\mathbf{W}_T$, and the empirical residual covariance at time $t$. We set $\nu_t = p_t + 1 + \epsilon$ with $\epsilon = T$ to reflect the effective prior sample size contributed by the full estimation period. This stabilizes $\mathbf{W}_{T+k}$ over the short forecast horizon and avoids noisy covariance estimates. The scalar \(c\) inflates the prior covariance \(\mathbf{W}_T\); we set \(c = 10^2\) to avoid overconfidence when extrapolating the estimation-period covariance into the forecast window and to allow enough flexibility when forecast-period signals differ from the pre-cutoff regime. In a brief sensitivity check (\(c \in \{1,5^2,10^2,20^2\}\)), \(c=10^2\) provided the best balance.
@@ -277,7 +256,7 @@ The operational forecast products are used only after a cutoff date. The NWS ens
 \subsection{Application-Specific State Specification}
 \label{subsec:specification}
 
-For the San Lorenzo application, the shared latent quantile process combines a local level, three seasonal harmonics, and the transfer component defined in Section~\ref{sec:methodology}. The discrepancy states follow the same dynamic backbone through \eqref{B4}. We first specify the trend and seasonal structure. The evolution matrix \(\mathbf{G}_t\), introduced in \eqref{A2} and also used in \eqref{B4}, is composed of a trend component and a seasonal component. For the trend component, we include a constant term to represent the long-term average level of the quantile of interest. This component is defined by the evolution matrix and observational vector:
+For the San Lorenzo application, the shared latent quantile process combines a local level, three seasonal harmonics, and the transfer component defined in Section~\ref{sec:methodology}. The discrepancy states use the same dynamic backbone as the latent trend-and-seasonal block through the repeated \(\mathbf{G}_t\) blocks in the full state evolution. We first specify the trend and seasonal structure. The matrix \(\mathbf{G}_t\) is composed of a trend component and a seasonal component. For the trend component, we include a constant term to represent the long-term average level of the quantile of interest. This component is defined by the evolution matrix and observational vector:
 \( \mathbf{G}^{\text{trend}}_t = [1], \quad
 \mathbf{F}^{\text{trend}}_t = [1]. \) The seasonal component incorporates three harmonics identified through exploratory spectral analysis to capture various seasonal cycles: an annual harmonic (12 months), a semiannual harmonic (6 months), and a long-term harmonic with an approximately 81-month (6.8 years) cycle. The seasonal component's evolution matrix and observational vector are defined as:
 \( \mathbf{G}^{\text{seas}}_t = \text{BlockDiag}\left(\textbf{J}_2(1,1),\ \textbf{J}_2(1,2),\ \textbf{J}_2\left(1,\frac{1}{6.8}\right)\right),\quad
@@ -310,7 +289,7 @@ Combining both components, the complete evolution matrix and observational vecto
 
 For prior hyperparameters (see Subsection~\ref{subsec:prioranddisc}), we specify \(\phi^j = 10^6\), \(\nu^j = 1\), and \(a_{\sigma^j} = b_{\sigma^j} = 10^{-6}\) for all \(1 \leq j \leq J\), reflecting diffuse prior beliefs. Sensitivity analyses for \(\phi^j \in \{10^1, 10^3, 10^6\}\) and \(b_{\sigma^j} \in \{10^{-1}, 10^{-3}, 10^{-6}\}\) showed no noticeable impact on model fit.
 
-We choose discount factors componentwise to reflect each component’s time scale and role. Recall that, in the discount-factor formulation \citep{prado2021time}, a smaller value \(d \in (0,1]\) for a given state parameter implies larger state-evolution variance and therefore greater adaptability of that component. We use component discounting. More specifically, we set a static local level with \(d_{\text{trend}}=1\), so the trend behaves effectively as a constant. For seasonality, we favor high persistence across all harmonics---yearly, semiannual, and the 80-month cycle---using a common value \(d_{\text{seas}}=0.9997\). This guards against overreacting to short-term fluctuations while allowing slow adjustment of amplitude and phase consistent with multi-year variability and occasional structural changes, such as modifications to local infrastructure. For the discrepancy states, we use \(d_{\text{disc}}=0.999\), providing modest flexibility to adapt to non-systematic differences between the retrospective analyses and the observations across wet and dry regimes. The covariate effects in~\eqref{A4} remain static with discount factors of 1. Finally, the transfer rate is set to \(\lambda=0.8995\), obtained by optimizing one-step-ahead CRPS with the above discount factors held fixed. These choices reflect the intended time scales of each component. In our experiments, discount-factor values above 0.9997 for the seasonal components and above 0.999 for the discrepancies gave qualitatively similar results, while the selected settings provided stable and interpretable dynamics. Smaller discount-factor values made the seasonal components too volatile to interpret and increased the risk of quantile crossing in the discrepancy states.
+We choose discount factors componentwise to reflect each component’s time scale and role. Recall that, in the discount-factor formulation \citep{prado2021time}, a smaller value \(d \in (0,1]\) for a given state parameter implies larger state-evolution variance and therefore greater adaptability of that component. We use component discounting. More specifically, we set a static local level with \(d_{\text{trend}}=1\), so the trend behaves effectively as a constant. For seasonality, we favor high persistence across all harmonics---yearly, semiannual, and the 80-month cycle---using a common value \(d_{\text{seas}}=0.9997\). This guards against overreacting to short-term fluctuations while allowing slow adjustment of amplitude and phase consistent with multi-year variability and occasional structural changes, such as modifications to local infrastructure. For the discrepancy states, we use \(d_{\text{disc}}=0.999\), providing modest flexibility to adapt to non-systematic differences between the retrospective products and the observations across wet and dry regimes. The covariate-effect states remain static with discount factors of 1. Finally, the transfer rate is set to \(\lambda=0.8995\), obtained by optimizing one-step-ahead CRPS with the above discount factors held fixed. These choices reflect the intended time scales of each component. In our experiments, discount-factor values above 0.9997 for the seasonal components and above 0.999 for the discrepancies gave qualitatively similar results, while the selected settings provided stable and interpretable dynamics. Smaller discount-factor values made the seasonal components too volatile to interpret and increased the risk of quantile crossing in the discrepancy states.
 
 \subsection{Rolling-Origin Forecast Evaluation Design}
 
