@@ -670,21 +670,24 @@ Goal: this is the main substantive rewrite.
 ### Phase G. Interpretation and synthesis-material decision
 Goal: defer until the main forecasting rewrite is settled.
 
-- [ ] Decide whether `fig:synth1` and `fig:synth2` remain in the final paper.
+- [x] Decide whether `fig:synth1` and `fig:synth2` remain in the final paper.
   - Source: `R1-m9[BRUNO-REVIEW]`
+  - Decision: keep `fig:synth1` in the main text as the operational illustration; move `fig:synth2` to the appendix as a historical-only counterfactual.
 
 If retained:
-- [ ] rewrite the surrounding discussion so their different roles are explicit
-- [ ] avoid letting them carry the main validation burden
+- [x] rewrite the surrounding discussion so their different roles are explicit
+- [x] avoid letting them carry the main validation burden
 
 If replaced:
 - [ ] update the manuscript and then recheck the rebuttal wording for `R1-m9`
 
-- [ ] Decide whether the `gamma / sigma` tables remain in the main paper or move to supplement.
+- [x] Decide whether the `gamma / sigma` tables remain in the main paper or move to supplement.
   - Source: structural blueprint Section 4
+  - Decision: move to appendix and reference briefly from the main text.
 
-- [ ] Decide whether the historical-regime figures remain as a compact main-text block or move to supplement.
+- [x] Decide whether the historical-regime figures remain as a compact main-text block or move to supplement.
   - Source: structural blueprint Section 4
+  - Decision: keep the dry/wet regime pair in the main text; move the 80-month seasonal figure to the appendix.
 
 ### Phase H. Conclusions and final consistency pass
 Goal: only after the body is stable.

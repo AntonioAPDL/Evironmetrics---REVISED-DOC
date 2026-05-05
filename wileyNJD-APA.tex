@@ -369,124 +369,7 @@ Table~\ref{tab:benchmark_crps_models} yields a consistent ranking across the fiv
 \section{INTERPRETATION OF THE SELECTED SPECIFICATION}
 \label{sec:interpretation}
 
-Because exAL-M-T1 attains the lowest CRPS in all five rolling-origin cutoffs, the remaining discussion focuses on that specification.
-
-\subsection{Source-Specific Shape and Scale Parameters}
-
-\begin{table*}[htbp]
-\caption{Posterior Medians and 95\% Credible Intervals for $\gamma$ by Source and Quantile Level}
-\label{tab:gamma_sigma_intervals1}
-\centering
-\renewcommand{\arraystretch}{1.08}
-\begin{tabular*}{\textwidth}{@{\extracolsep{\fill}} l
-  S[table-format=-1.3] l
-  S[table-format=-1.3] l
-  S[table-format=-1.3] l
-  }
-\toprule
-\multirow{2}{*}{\textbf{Quantile}} &
-\multicolumn{2}{c}{\textbf{USGS}} &
-\multicolumn{2}{c}{\textbf{GLOFAS}} &
-\multicolumn{2}{c}{\textbf{NWS}} \\
-\cmidrule(lr){2-3} \cmidrule(lr){4-5} \cmidrule(lr){6-7}
-& {\textbf{Median}} & {\textbf{95\% CI}}
-& {\textbf{Median}} & {\textbf{95\% CI}}
-& {\textbf{Median}} & {\textbf{95\% CI}} \\
-\midrule
-05th  & 0.796   & $[0.781,\ 0.809]$   & 1.06    & $[1.04,\ 1.07]$   & 0.991   & $[0.976,\ 1.01]$   \\
-20th  & 0.0599  & $[0.0471,\ 0.0734]$ & 0.330   & $[0.318,\ 0.342]$ & 0.219   & $[0.206,\ 0.232]$ \\
-35th  & -0.0232 & $[-0.0297,\ -0.0174]$ & 0.0827 & $[0.0739,\ 0.0911]$ & 0.0881 & $[0.0786,\ 0.0983]$ \\
-50th  & -0.0997 & $[-0.109,\ -0.0906]$ & -0.0451 & $[-0.0517,\ -0.0382]$ & 0.00766 & $[-0.000356,\ 0.0146]$ \\
-65th  & -0.285  & $[-0.297,\ -0.273]$ & -0.257  & $[-0.267,\ -0.248]$ & -0.0767 & $[-0.0870,\ -0.0671]$ \\
-80th  & -0.655  & $[-0.673,\ -0.637]$ & -0.744  & $[-0.758,\ -0.731]$ & -0.212  & $[-0.224,\ -0.200]$ \\
-95th  & -1.82   & $[-1.85,\ -1.80]$   & -2.38   & $[-2.41,\ -2.36]$   & -1.13   & $[-1.15,\ -1.12]$ \\
-\bottomrule
-\end{tabular*}
-\begin{tablenotes}
-\item \textit{Note:} Entries show the posterior median and the 95\% credible interval $[{\rm Q2.5}, {\rm Q97.5}]$ for each source and quantile.
-\end{tablenotes}
-\end{table*}
-
-
-\begin{table*}[htbp]
-\caption{Posterior Medians and 95\% Credible Intervals for $\sigma$ by Source and Quantile Level}
-\label{tab:gamma_sigma_intervals2}
-\centering
-\renewcommand{\arraystretch}{1.08}
-\begin{tabular*}{\textwidth}{@{\extracolsep{\fill}} l
-  S[table-format=1.5] l
-  S[table-format=1.5] l
-  S[table-format=1.5] l
-  }
-\toprule
-\multirow{2}{*}{\textbf{Quantile}} &
-\multicolumn{2}{c}{\textbf{USGS}} &
-\multicolumn{2}{c}{\textbf{GLOFAS}} &
-\multicolumn{2}{c}{\textbf{NWS}} \\
-\cmidrule(lr){2-3} \cmidrule(lr){4-5} \cmidrule(lr){6-7}
-& {\textbf{Median}} & {\textbf{95\% CI}}
-& {\textbf{Median}} & {\textbf{95\% CI}}
-& {\textbf{Median}} & {\textbf{95\% CI}} \\
-\midrule
-05th  & 0.0281 & $[0.0277,\ 0.0285]$  & 0.0272 & $[0.0269,\ 0.0275]$  & 0.0332 & $[0.0327,\ 0.0336]$ \\
-20th  & 0.0560 & $[0.0552,\ 0.0568]$  & 0.0563 & $[0.0556,\ 0.0570]$  & 0.0650 & $[0.0640,\ 0.0658]$ \\
-35th  & 0.0745 & $[0.0734,\ 0.0755]$  & 0.0687 & $[0.0678,\ 0.0696]$  & 0.0813 & $[0.0802,\ 0.0824]$ \\
-50th  & 0.0826 & $[0.0814,\ 0.0837]$  & 0.0743 & $[0.0734,\ 0.0753]$  & 0.0852 & $[0.0840,\ 0.0864]$ \\
-65th  & 0.0817 & $[0.0805,\ 0.0828]$  & 0.0736 & $[0.0727,\ 0.0746]$  & 0.0805 & $[0.0794,\ 0.0816]$ \\
-80th  & 0.0725 & $[0.0715,\ 0.0735]$  & 0.0677 & $[0.0668,\ 0.0685]$  & 0.0646 & $[0.0638,\ 0.0655]$ \\
-95th  & 0.0435 & $[0.0429,\ 0.0440]$  & 0.0475 & $[0.0470,\ 0.0480]$  & 0.0356 & $[0.0351,\ 0.0361]$ \\
-\bottomrule
-\end{tabular*}
-\begin{tablenotes}
-\item \textit{Note:} Entries show the posterior median and the 95\% credible interval $[{\rm Q2.5}, {\rm Q97.5}]$ for each source and quantile.
-\end{tablenotes}
-\end{table*}
-
-
-Tables~\ref{tab:gamma_sigma_intervals1} and \ref{tab:gamma_sigma_intervals2} report posterior \emph{medians} and 95\% credible intervals for the skewness (\(\gamma\)) and scale (\(\sigma\)) of the exAL models across sources and quantiles. Two patterns in \(\gamma\) stand out. \emph{(i) Lower quantiles (0.05–0.35):} GLOFAS and NWS exhibit clearly positive \(\gamma\), while USGS shows smaller magnitudes and is already near symmetric by the 0.35 quantile (slightly negative). This indicates that, under our fit, quantile-model residuals around the lower tail for agency series are more right-skewed than for the observations. \emph{(ii) Median and upper quantiles (0.50–0.95):} \(\gamma\) becomes negative for all sources, with magnitudes ordering roughly as \(|\gamma_{\text{GLOFAS}}| > |\gamma_{\text{USGS}}| > |\gamma_{\text{NWS}}|\) at the upper tail (e.g., at the 0.95 quantile). At the median, USGS and GLOFAS are mildly negative, whereas NWS is essentially symmetric (its 95\% interval straddles zero). Interpreting \(\gamma\) as residual asymmetry under our quantile-model, these results support the use of the extended AL likelihood to flexibly accommodate tail-specific skewness that varies by source and quantile.
-
-For \(\sigma\), which measures residual dispersion of the quantile fit (and not the intrinsic quality of a product), we observe that NWS tends to have the largest \(\sigma\) at lower and central quantiles (e.g., 0.05–0.65), GLOFAS is often the smallest over 0.05–0.80 but becomes the largest at the 0.95 quantile, and USGS typically lies in between (e.g., slightly larger than GLOFAS around the median, but smaller than GLOFAS at the 0.95 quantile). Credible intervals across sources are largely distinct (with limited overlap at a few central quantiles), reinforcing the need for source-specific \((\gamma,\sigma)\) parameters. Overall, the updated estimates align with a coherent picture in which residual asymmetry and dispersion meaningfully differ by source and vary across quantiles, and our specification captures these differences explicitly.
-
-\subsection{Historical Behavior Across Representative Regimes}
-
-For clarity, we focus further analysis on the 5th, 50th, and 95th quantiles, comparing model dynamics during the 2012–2016 drought and the 2017–2019 wet period to assess performance under contrasting hydrological regimes.
-
-\begin{figure}[h]
-\centering
-\includegraphics[width=450pt]{DISC/80_component_1991_2022.png}
-\caption{
-Posterior mean and 95\% credible intervals for the 80-month seasonal component of river flow from 1991 to 2022, estimated at the 5th (red), 50th (green), and 95th (blue) quantiles. Observed USGS daily flow is shown in black for reference.
-}
-\label{fig:80_components}
-\end{figure}
-
-Figure~\ref{fig:80_components} displays the estimated 80-month seasonality component for the 5th, 50th, and 95th quantiles from 1991 to 2022. The three quantile-specific estimates are closely aligned, indicating a stable long-term cycle across flow regimes. Notably, the component reaches its highest during the 2017–2019 wet period and its lowest through the 2012–2016 drought. This component became more regular after the early 2000s, coinciding with increased management and infrastructure interventions visible in the river flow data. These results highlight the component's value for capturing multi-year hydrological variability.
-
- % (see Figure~\ref{fig:sanlorenzo}, especially after the 2004 levee and floodwall reconstruction). 
- 
-\begin{figure}[h]
-\centering
-\includegraphics[width=450pt]{DISC/All_exal_2012-2016_DISC.png}
-\caption{
-Posterior mean and 95\% credible intervals of river flow quantiles during the dry period (2012--2016). Shown are estimates for the 5th (red), 50th (green), and 95th (blue) quantile models, along with observed daily USGS flow (black). Horizontal dashed lines mark NOAA-defined minor and major flooding thresholds.
-}
-\label{fig:dry_quantile}
-\end{figure}
-
-\begin{figure}[h]
-\centering
-\includegraphics[width=450pt]{DISC/All_exal_2017-2019_DISC.png}
-\caption{
-Posterior mean and 95\% credible intervals of river flow quantiles during the wet period (2017--2019). Shown are estimates for the 5th (red), 50th (green), and 95th (blue) quantile models, along with observed daily USGS flow (black). Horizontal dashed lines mark NOAA-defined minor and major flooding thresholds.
-}
-\label{fig:rainy_quantile}
-\end{figure}
-
-Figures~\ref{fig:dry_quantile} and \ref{fig:rainy_quantile} show posterior means and 95\% credible intervals for the 5th, 50th, and 95th quantile models during the dry (2012–2016) and wet (2017–2019) periods. In the wet period, river discharge exhibits greater variability, especially in late fall and early winter. In the winters of 2017 and 2019, the 95th quantile frequently exceeds the major flood stage threshold; in February 2017, the 5th quantile approaches the minor flood stage, consistent with observed flooding. These patterns indicate that the quantile models capture shifts in tail risk associated with high–flow episodes.
-
-Credible bands around each individual quantile are relatively tight and stable overall, consistent with the long sample and the model’s linear dynamics. The quantile range (Q95–Q05), however, is adaptive to the different periods: it narrows during the dry period (2012–2016) and rain–free months, and widens in the wet period (2017–2019) and during late–fall/early–winter events. This widening during high–flow episodes suggests the model allocates more uncertainty when flows are volatile, aligning with precipitation–driven variability.
-
-No quantile crossing was observed in our results, despite fitting models independently for each quantile. However, quantile crossing can still occur, particularly in smaller samples or with more volatile data. If this becomes a concern, joint model selection approaches that impose non-crossing constraints could be considered to ensure the monotonicity of quantile estimates.
+Because exAL-M-T1 attains the lowest CRPS in all five rolling-origin cutoffs, the remaining discussion focuses on that specification. Detailed source-specific summaries for the exAL shape and scale parameters are reported in Appendix~\ref{app:sourceparams}. In the main text, we focus on the aspects of the selected model that are most informative for interpretation.
 
 \subsection{Covariate Effects}
 
@@ -522,38 +405,40 @@ No quantile crossing was observed in our results, despite fitting models indepen
 \end{threeparttable}
 \end{table*}
 
-Table~\ref{tab:components_23_31} reports posterior means and 95\% credible intervals for the transfer–function coefficients at the 5th, 50th, and 95th quantiles (coefficients evaluated at time \(T\)). Precipitation shows the largest and increasing mean effect across quantiles \((\approx 1.95,\ 2.39,\ 2.95)\), confirming it as the primary driver of higher flows and the upper tail. 
+Table~\ref{tab:components_23_31} reports posterior means and 95\% credible intervals for the transfer-function coefficients at the 5th, 50th, and 95th quantiles. Precipitation has the largest positive effect and increases with the quantile level, indicating that it is the dominant driver of upper-tail flow behavior. Soil moisture is also positive at all three quantiles, with a stronger effect in the upper tail, which is consistent with antecedent wetness amplifying runoff during storms.
 
-Soil moisture is \emph{positive} at all quantiles and more pronounced in the upper tail \((\approx 0.12,\ 0.12,\ 0.25)\). A natural interpretation is antecedent wetness; wetter catchment conditions elevate baseline flow and, during storms, reduce infiltration capacity and increase runoff efficiency, thereby amplifying higher quantiles. The effect is modest at low–to–median quantiles and becomes more influential for the 95th quantile, consistent with amplification of peaks under saturated soils.
+The first principal component remains negative and comparatively small after conditioning on precipitation and soil moisture, so its role is secondary to the local hydrometeorological covariates. Taken together, these estimates indicate that the transfer component is driven primarily by precipitation and antecedent wetness, with the climate index acting as a broader large-scale adjustment.
 
-The large–scale climate factor (first principal component) remains negative and comparatively small \((\approx -0.08,\ -0.06,\ -0.03)\), with magnitude decreasing toward higher quantiles. Conditional on precipitation and soil moisture, this suggests phases of the aggregated climate indices are associated with slightly lower flows on average, but the effect is secondary relative to the physically local covariates.
+\subsection{Historical Behavior Across Representative Regimes}
 
-Overall, the increase of both precipitation and soil--moisture effects toward the upper tail emphasizes their joint role in shaping extremes. This pattern motivates further work on forecast-window transfer specifications that use calibrated probabilistic inputs for these covariates.
+To illustrate how the selected specification adapts across contrasting hydrological conditions, we focus on the 5th, 50th, and 95th quantiles during the 2012--2016 drought and the 2017--2019 wet period.
 
+\begin{figure}[h]
+\centering
+\includegraphics[width=450pt]{DISC/All_exal_2012-2016_DISC.png}
+\caption{
+Posterior mean and 95\% credible intervals of river flow quantiles during the dry period (2012--2016). Shown are estimates for the 5th (red), 50th (green), and 95th (blue) quantile models, along with observed daily USGS flow (black). Horizontal dashed lines mark NOAA-defined minor and major flooding thresholds.
+}
+\label{fig:dry_quantile}
+\end{figure}
 
-\subsection{Posterior Predictive Synthesis}
-\label{subsec:synthesis}
+\begin{figure}[h]
+\centering
+\includegraphics[width=450pt]{DISC/All_exal_2017-2019_DISC.png}
+\caption{
+Posterior mean and 95\% credible intervals of river flow quantiles during the wet period (2017--2019). Shown are estimates for the 5th (red), 50th (green), and 95th (blue) quantile models, along with observed daily USGS flow (black). Horizontal dashed lines mark NOAA-defined minor and major flooding thresholds.
+}
+\label{fig:rainy_quantile}
+\end{figure}
 
-To obtain a single predictive distribution from several quantile-specific posterior models, we synthesize their posterior predictive quantiles into one quantile function.
+Figures~\ref{fig:dry_quantile} and \ref{fig:rainy_quantile} show clear differences between the drought and wet-regime periods. During 2012--2016, the posterior bands remain comparatively narrow and the upper tail rarely approaches the flood thresholds. During 2017--2019, the upper tail widens substantially during the main winter events, and the 95th quantile exceeds the major flood stage in 2017 and 2019.
 
-Let $F_t$ denote the true but unknown predictive distribution of the observation $y_t$ at time $t$. We target $L \in \mathbb{Z}_+$ distinct quantile levels $\tau_1 < \tau_2 < \dots < \tau_L$, and for each $\tau_i$, define $\hat{F}_{i,t}$ as the posterior predictive distribution from the $\text{exAL}_{\tau_i}$ model. By construction, each model is locally accurate at its respective quantile:
-\[
-\hat{F}_{i,t}^{-1}(\tau_i) \approx F_t^{-1}(\tau_i), \quad \forall i \in \{1, \dots, L\}.
-\]
+The contrast between these periods is most visible in the spread between the 5th and 95th quantiles. That spread remains relatively tight under dry conditions but expands during wet-season peaks, indicating that the selected specification allocates greater predictive spread when hydrological variability increases.
 
-To synthesize these models, we define a unified quantile function, $(F_t^{\text{synth}})^{-1}(u)$, using piecewise linear interpolation between adjacent quantile models:
-\begin{align}
-(F^{\text{synth}}_t)^{-1}(u) =
-\begin{cases}
-\hat{F}_{1,t}^{-1}(u), & u \leq \tau_1, \\
-(1 - w)\hat{F}_{i,t}^{-1}(u) + w\hat{F}_{i+1,t}^{-1}(u), & \tau_i \leq u < \tau_{i+1}, \\
-\hat{F}_{L,t}^{-1}(u), & u \geq \tau_L,
-\end{cases}
-\label{synth_quantile}
-\end{align}
-where $w = \frac{u - \tau_i}{\tau_{i+1} - \tau_i}$ and $i = \max\{j : \tau_j \leq u\}$. This construction guarantees that the synthesized quantile function matches the posterior predictive quantiles at the specified levels and provides a smooth approximation between them.
+\subsection{Synthesized Predictive Illustration}
+\label{subsec:synthillustration}
 
-Because the quantile models are fit independently, quantile crossing can in principle occur. When needed, we enforce monotonicity by first applying isotonic regression to the fitted quantiles at the target levels \citep{barlow1972} and then applying monotone rearrangement to the interpolated quantile curve \citep{chernozhukov2010}. In our application, no quantile crossing was observed, so the corrected and uncorrected syntheses were nearly identical.
+Figure~\ref{fig:synth1} illustrates the synthesized predictive distribution for the December 25, 2022 cutoff. It is included as an operational illustration of how the fitted quantile-specific forecasts combine into one predictive distribution; the comparative forecast evaluation remains the primary empirical evidence of the paper.
 
 \begin{figure}[h]
 \centering
@@ -563,18 +448,7 @@ Synthesized posterior predictive distribution for river flow (log-log scale, cm$
 }
 \label{fig:synth1}
 \end{figure}
-Figure~\ref{fig:synth1} shows the synthesized posterior predictive distribution obtained by integrating observed USGS measurements, retrospective analyses, and ensemble forecasts before and after December 25, 2022. Retrospective analyses (from ECMWF and NWS) and ensemble forecasts are displayed as gray curves. Observed USGS measurements available prior to December 25 are shown in green, whereas future measurements are shown in red. Horizontal dashed lines indicate NOAA-defined minor and major flooding thresholds. The 28-day forecast horizon captures a marked increase in projected flows after the cutoff date, with the upper quantiles remaining above the major flood threshold for several days. Some overestimation is still apparent, which is consistent with the difficulty of predicting precipitation at lead times relevant to flood risk management.
-
-\begin{figure}[h]
-\centering
-\includegraphics[width=450pt]{DISC/posterior_samples_counter_valid.png}
-\caption{
-Idealized benchmark synthesized posterior predictive distribution for river flow (log-log scale, cm$^3$/s), based only on historical observed USGS measurements. Observed measurements before December 25, 2022, are shown in green, and unobserved future measurements are shown in red. No retrospective analyses or ensemble forecasts are included. Horizontal dashed lines indicate NOAA-defined minor and major flooding thresholds. The thin black lines shown along with the synthesized distribution (pink) correspond to the quantiles of the synthesized distribution (percentiles: 0.05, 0.20, 0.35, 0.5, 0.65, 0.8, 0.95). 
-}
-\label{fig:synth2}
-\end{figure}
-
-Figure~\ref{fig:synth2} presents an idealized benchmark synthesized distribution obtained by using only historical USGS measurements, excluding retrospective analyses and ensemble forecasts. This scenario assumes perfect future knowledge of covariate values and no forecast uncertainty. Comparing it with Figure~\ref{fig:synth1} illustrates how forecast and retrospective inputs change the synthesized predictive distribution in the operational setting.
+The synthesized predictive distribution combines observed USGS measurements before the cutoff with the retrospective and forecast products available at that origin. The upper quantiles rise sharply after December 25, 2022 and remain above the major flood threshold for several days, reflecting the high-risk character of this forecast window. An idealized historical-only reference is reported in Appendix~\ref{app:historicalsynth} to separate the operational synthesis from the simpler no-forecast counterfactual.
 
 \section{Conclusions}
 \label{sec5}
@@ -619,6 +493,110 @@ The reusable exDQLM estimation routines are available through the CRAN R package
 
 
 \appendix
+
+\section{Additional Parameter and Illustrative Summaries}
+\label{app:extras}
+
+\subsection{Source-Specific Shape and Scale Parameters}
+\label{app:sourceparams}
+
+\begin{table*}[htbp]
+\caption{Posterior Medians and 95\% Credible Intervals for $\gamma$ by Source and Quantile Level}
+\label{tab:gamma_sigma_intervals1}
+\centering
+\renewcommand{\arraystretch}{1.08}
+\begin{tabular*}{\textwidth}{@{\extracolsep{\fill}} l
+  S[table-format=-1.3] l
+  S[table-format=-1.3] l
+  S[table-format=-1.3] l
+  }
+\toprule
+\multirow{2}{*}{\textbf{Quantile}} &
+\multicolumn{2}{c}{\textbf{USGS}} &
+\multicolumn{2}{c}{\textbf{GLOFAS}} &
+\multicolumn{2}{c}{\textbf{NWS}} \\
+\cmidrule(lr){2-3} \cmidrule(lr){4-5} \cmidrule(lr){6-7}
+& {\textbf{Median}} & {\textbf{95\% CI}}
+& {\textbf{Median}} & {\textbf{95\% CI}}
+& {\textbf{Median}} & {\textbf{95\% CI}} \\
+\midrule
+05th  & 0.796   & $[0.781,\ 0.809]$   & 1.06    & $[1.04,\ 1.07]$   & 0.991   & $[0.976,\ 1.01]$   \\
+20th  & 0.0599  & $[0.0471,\ 0.0734]$ & 0.330   & $[0.318,\ 0.342]$ & 0.219   & $[0.206,\ 0.232]$ \\
+35th  & -0.0232 & $[-0.0297,\ -0.0174]$ & 0.0827 & $[0.0739,\ 0.0911]$ & 0.0881 & $[0.0786,\ 0.0983]$ \\
+50th  & -0.0997 & $[-0.109,\ -0.0906]$ & -0.0451 & $[-0.0517,\ -0.0382]$ & 0.00766 & $[-0.000356,\ 0.0146]$ \\
+65th  & -0.285  & $[-0.297,\ -0.273]$ & -0.257  & $[-0.267,\ -0.248]$ & -0.0767 & $[-0.0870,\ -0.0671]$ \\
+80th  & -0.655  & $[-0.673,\ -0.637]$ & -0.744  & $[-0.758,\ -0.731]$ & -0.212  & $[-0.224,\ -0.200]$ \\
+95th  & -1.82   & $[-1.85,\ -1.80]$   & -2.38   & $[-2.41,\ -2.36]$   & -1.13   & $[-1.15,\ -1.12]$ \\
+\bottomrule
+\end{tabular*}
+\begin{tablenotes}
+\item \textit{Note:} Entries show the posterior median and the 95\% credible interval $[{\rm Q2.5}, {\rm Q97.5}]$ for each source and quantile.
+\end{tablenotes}
+\end{table*}
+
+\begin{table*}[htbp]
+\caption{Posterior Medians and 95\% Credible Intervals for $\sigma$ by Source and Quantile Level}
+\label{tab:gamma_sigma_intervals2}
+\centering
+\renewcommand{\arraystretch}{1.08}
+\begin{tabular*}{\textwidth}{@{\extracolsep{\fill}} l
+  S[table-format=1.5] l
+  S[table-format=1.5] l
+  S[table-format=1.5] l
+  }
+\toprule
+\multirow{2}{*}{\textbf{Quantile}} &
+\multicolumn{2}{c}{\textbf{USGS}} &
+\multicolumn{2}{c}{\textbf{GLOFAS}} &
+\multicolumn{2}{c}{\textbf{NWS}} \\
+\cmidrule(lr){2-3} \cmidrule(lr){4-5} \cmidrule(lr){6-7}
+& {\textbf{Median}} & {\textbf{95\% CI}}
+& {\textbf{Median}} & {\textbf{95\% CI}}
+& {\textbf{Median}} & {\textbf{95\% CI}} \\
+\midrule
+05th  & 0.0281 & $[0.0277,\ 0.0285]$  & 0.0272 & $[0.0269,\ 0.0275]$  & 0.0332 & $[0.0327,\ 0.0336]$ \\
+20th  & 0.0560 & $[0.0552,\ 0.0568]$  & 0.0563 & $[0.0556,\ 0.0570]$  & 0.0650 & $[0.0640,\ 0.0658]$ \\
+35th  & 0.0745 & $[0.0734,\ 0.0755]$  & 0.0687 & $[0.0678,\ 0.0696]$  & 0.0813 & $[0.0802,\ 0.0824]$ \\
+50th  & 0.0826 & $[0.0814,\ 0.0837]$  & 0.0743 & $[0.0734,\ 0.0753]$  & 0.0852 & $[0.0840,\ 0.0864]$ \\
+65th  & 0.0817 & $[0.0805,\ 0.0828]$  & 0.0736 & $[0.0727,\ 0.0746]$  & 0.0805 & $[0.0794,\ 0.0816]$ \\
+80th  & 0.0725 & $[0.0715,\ 0.0735]$  & 0.0677 & $[0.0668,\ 0.0685]$  & 0.0646 & $[0.0638,\ 0.0655]$ \\
+95th  & 0.0435 & $[0.0429,\ 0.0440]$  & 0.0475 & $[0.0470,\ 0.0480]$  & 0.0356 & $[0.0351,\ 0.0361]$ \\
+\bottomrule
+\end{tabular*}
+\begin{tablenotes}
+\item \textit{Note:} Entries show the posterior median and the 95\% credible interval $[{\rm Q2.5}, {\rm Q97.5}]$ for each source and quantile.
+\end{tablenotes}
+\end{table*}
+
+Tables~\ref{tab:gamma_sigma_intervals1} and \ref{tab:gamma_sigma_intervals2} summarize the source-specific skewness (\(\gamma\)) and scale (\(\sigma\)) parameters of the exAL observation model. The estimates vary across both source and quantile, which supports the use of source-specific exAL parameters rather than a single common shape-and-scale specification.
+
+\subsection{Long-Cycle Seasonal Component}
+\label{app:longcycle}
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=450pt]{DISC/80_component_1991_2022.png}
+\caption{
+Posterior mean and 95\% credible intervals for the 80-month seasonal component of river flow from 1991 to 2022, estimated at the 5th (red), 50th (green), and 95th (blue) quantiles. Observed USGS daily flow is shown in black for reference.
+}
+\label{fig:80_components}
+\end{figure}
+
+Figure~\ref{fig:80_components} shows that the 80-month seasonal component is broadly aligned across the three representative quantiles and captures multi-year wet and dry phases in the historical record.
+
+\subsection{Idealized Historical-Only Synthesis}
+\label{app:historicalsynth}
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=450pt]{DISC/posterior_samples_counter_valid.png}
+\caption{
+Idealized benchmark synthesized posterior predictive distribution for river flow (log-log scale, cm$^3$/s), based only on historical observed USGS measurements. Observed measurements before December 25, 2022, are shown in green, and unobserved future measurements are shown in red. No retrospective analyses or ensemble forecasts are included. Horizontal dashed lines indicate NOAA-defined minor and major flooding thresholds. The thin black lines shown along with the synthesized distribution (pink) correspond to the quantiles of the synthesized distribution (percentiles: 0.05, 0.20, 0.35, 0.5, 0.65, 0.8, 0.95).
+}
+\label{fig:synth2}
+\end{figure}
+
+Figure~\ref{fig:synth2} provides a historical-only reference for the December 25, 2022 cutoff. It is included to contrast the operational synthesis in Figure~\ref{fig:synth1} with a simpler counterfactual that excludes retrospective and forecast products.
 
 \section{Markov Chain Monte Carlo Algorithms}
 \begin{algorithm}
