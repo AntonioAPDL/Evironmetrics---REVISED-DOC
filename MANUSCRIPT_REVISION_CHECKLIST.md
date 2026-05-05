@@ -692,18 +692,18 @@ If replaced:
 ### Phase H. Conclusions and final consistency pass
 Goal: only after the body is stable.
 
-- [ ] Rewrite the conclusions so they match the revised paper rather than the old single-cutoff manuscript.
+- [x] Rewrite the conclusions so they match the revised paper rather than the old single-cutoff manuscript.
   - Source: global consistency with `HE-2` to `HE-7`
 
-- [ ] Make sure the conclusion reflects:
+- [x] Make sure the conclusion reflects:
   - five-cutoff validation
   - simpler Bayesian comparisons
   - raw forecast-product comparisons
-  - CRPS + quantile diagnostics
   - latest-forecast-only protocol
-  - ablation results, if retained in the main paper
+  - supporting interpretation from the selected specification
+  - supplementary diagnostics only if they are retained elsewhere in the submission package
 
-- [ ] Final terminology sweep:
+- [x] Final terminology sweep:
   - `raw forecast products`
   - `retrospective products`
   - `forecast products`
