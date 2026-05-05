@@ -524,7 +524,7 @@ Overall, the increase of both precipitation and soil–moisture effects toward t
 \subsection{Posterior Predictive Synthesis}
 \label{subsec\:synthesis}
 
-To obtain a single, coherent predictive distribution from several quantile-specific posterior models, we propose a synthesis strategy that utilizes localized quantile information. This approach aims to integrate the strengths of individual models, each optimized for a particular quantile, into a unified quantile function.
+To obtain a single predictive distribution from several quantile-specific posterior models, we synthesize their posterior predictive quantiles into one quantile function.
 
 Let $F_t$ denote the true but unknown predictive distribution of the observation $y_t$ at time $t$. We target $L \in \mathbb{Z}_+$ distinct quantile levels $\tau_1 < \tau_2 < \dots < \tau_L$, and for each $\tau_i$, define $\hat{F}_{i,t}$ as the posterior predictive distribution from the $\text{exAL}_{\tau_i}$ model. By construction, each model is locally accurate at its respective quantile:
 \[
@@ -543,34 +543,7 @@ To synthesize these models, we define a unified quantile function, $(F_t^{\text{
 \end{align}
 where $w = \frac{u - \tau_i}{\tau_{i+1} - \tau_i}$ and $i = \max\{j : \tau_j \leq u\}$. This construction guarantees that the synthesized quantile function matches the posterior predictive quantiles at the specified levels and provides a smooth approximation between them.
 
-The key assumption of this synthesis approach is that each quantile model provides a correctly estimated quantile at its target level, ensuring that the resulting quantile function remains monotonic. In practice, this assumption can be violated, especially since the quantile models are fit independently, which may lead to quantile crossing (e.g., $\hat{F}_{k,t}^{-1}(\tau_k) > \hat{F}_{\ell,t}^{-1}(\tau_\ell)$ for $\tau_k < \tau_\ell$) or a loss of monotonicity in the synthesized quantile function. 
-
-To resolve quantile crossing and guarantee a globally monotonic synthesized quantile function, we implement an additional two-step correction procedure.
-
-\paragraph{Isotonic Adjustment}  
-First, we enforce monotonicity at the specified quantile levels by applying isotonic regression \citep{barlow1972}. At each time $t$, we solve the following constrained least squares problem:
-\begin{align}
-\mathbf{m}_t^* = \underset{m_1 \leq m_2 \leq \dots \leq m_L}{\arg\min} \sum_{i=1}^L \left( \hat{F}_{i,t}^{-1}(\tau_i) - m_i \right)^2,
-\label{eq:isotonic_regression}
-\end{align}
-where $\hat{F}_{i,t}^{-1}(\tau_i)$ are the independently estimated posterior predictive quantiles. The solution, $\mathbf{m}_t^* = (m_{1,t}^*, \dots, m_{L,t}^*)$, provides a set of non-decreasing quantile values. We then adjust the corresponding posterior predictive distributions by shifting each posterior predictive distribution samples:
-\[
-y_{i,t}^{\text{adj}} = y + (m_{i,t}^* - \hat{F}_{i,t}^{-1}(\tau_i)), \quad y \sim \hat{F}_{i,t},
-\]
-producing adjusted distributions $F_{i,t}^{\text{adj}}$ that now satisfy $(F_{i,t}^{\text{adj}})^{-1}(\tau_i) = m_{i,t}^*$ at the target quantiles.
-
-Using these isotonic-adjusted distributions in place of the originals, we repeat the synthesis in Eq.~\ref{synth_quantile} to produce an initial synthesized quantile function, denoted $Q_t^{\text{init}}$.
-
-\paragraph{Monotonic Rearrangement}  
-Second, to enforce monotonicity across the entire quantile domain (not just at the grid points), we apply monotonic rearrangement as described by \citet{chernozhukov2010}. This is accomplished by:
-\begin{enumerate}
-    \item Evaluating $Q_t^{\text{init}}$ on a dense grid $\{u_k = k/(M+1)\}_{k=1}^M$.
-    \item Sorting the resulting values to obtain $\mathbf{q}_t^{\uparrow} = \operatorname{sort}(Q_t^{\text{init}}(u_1), \dots, Q_t^{\text{init}}(u_M))$.
-    \item Defining the final synthesized quantile function $Q_t$ via linear interpolation of the pairs $\{(u_k, q_{t,k}^{\uparrow})\}_{k=1}^M$.
-\end{enumerate}
-This rearrangement step ensures strict monotonicity of the final synthesized quantile function $Q_t$, with finite-sample theoretical guarantees for quantile estimation.
-
-In our specific application, the corrected posterior predictive synthesis yielded results nearly identical to the uncorrected synthesis described earlier, primarily due to the absence of quantile crossing. Consequently, the explicit monotonicity corrections had limited practical impact.
+Because the quantile models are fit independently, quantile crossing can in principle occur. When needed, we enforce monotonicity by first applying isotonic regression to the fitted quantiles at the target levels \citep{barlow1972} and then applying monotone rearrangement to the interpolated quantile curve \citep{chernozhukov2010}. In our application, no quantile crossing was observed, so the corrected and uncorrected syntheses were nearly identical.
 
 \begin{figure}[h]
 \centering
@@ -580,7 +553,7 @@ Synthesized posterior predictive distribution for river flow (log-log scale, cm$
 }
 \label{fig:synth1}
 \end{figure}
-Figure~\ref{fig:synth1} shows the synthesized posterior predictive distribution obtained by integrating observed USGS measurements, retrospective analyses, and ensemble forecasts, both before and after December 25, 2022. Retrospective analyses (from ECMWF and NWS) and ensemble forecasts are displayed as gray curves, illustrating the spread and uncertainty from external forecast products. Observed USGS measurements available prior to December 25 are shown in green, whereas unobserved future measurements (after December 25) are presented in red. Horizontal dashed lines indicate NOAA-defined minor and major flooding thresholds. The forecast horizon covers 28 days after the cutoff date, allowing direct comparison with subsequently observed river flows. The results indicate that, as of December 25, a marked shift in hydrological conditions was forecasted, with the upper quantiles remaining consistently above the major flood threshold. Such a signal would likely prompt the issuance of a flood warning for the following week. Not surprisingly, precipitation emerges as a dominant driver of these projected flows; however, some overestimation is apparent, reflecting the inherent difficulty of producing accurate precipitation forecasts, particularly for amounts at lead times relevant to flood risk management.
+Figure~\ref{fig:synth1} shows the synthesized posterior predictive distribution obtained by integrating observed USGS measurements, retrospective analyses, and ensemble forecasts before and after December 25, 2022. Retrospective analyses (from ECMWF and NWS) and ensemble forecasts are displayed as gray curves. Observed USGS measurements available prior to December 25 are shown in green, whereas future measurements are shown in red. Horizontal dashed lines indicate NOAA-defined minor and major flooding thresholds. The 28-day forecast horizon captures a marked increase in projected flows after the cutoff date, with the upper quantiles remaining above the major flood threshold for several days. Some overestimation is still apparent, which is consistent with the difficulty of predicting precipitation at lead times relevant to flood risk management.
 
 \begin{figure}[h]
 \centering
@@ -591,7 +564,7 @@ Idealized benchmark synthesized posterior predictive distribution for river flow
 \label{fig:synth2}
 \end{figure}
 
-Figure~\ref{fig:synth2} presents an alternative, idealized benchmark synthesized distribution obtained by using only historical USGS measurements, excluding retrospective analyses and ensemble forecasts. This scenario assumes perfect future knowledge of covariate values and no forecast uncertainty—conditions unattainable in operational settings. Comparing this idealized benchmark with the main synthesized distribution in Figure~\ref{fig:synth1} highlights the practical value of incorporating ensemble forecasts and external data sources, even when those inputs are affected by the limitations and uncertainties associated with precipitation prediction. The thin black lines shown along with the synthesized distribution (pink) correspond to the quantiles of the synthesized distribution (percentiles: 0.05, 0.20, 0.35, 0.5, 0.65, 0.8, 0.95). 
+Figure~\ref{fig:synth2} presents an idealized benchmark synthesized distribution obtained by using only historical USGS measurements, excluding retrospective analyses and ensemble forecasts. This scenario assumes perfect future knowledge of covariate values and no forecast uncertainty. Comparing it with Figure~\ref{fig:synth1} illustrates how forecast and retrospective inputs change the synthesized predictive distribution in the operational setting.
 
 \section{Conclusions}
 \label{sec5}

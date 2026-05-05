@@ -324,12 +324,12 @@ Goal: reduce obvious overlength before structural rewrites.
   - Source: `HE-4`, `R1-M3`
   - Current location: `216-245`
 
-- [ ] Shorten the posterior predictive synthesis section.
+- [x] Shorten the posterior predictive synthesis section.
   - Source: `R1-M3`
   - Current location: `540-610`
   - Keep a concise description because it remains part of the contribution.
 
-- [ ] Reduce the quantile-crossing discussion to a brief robustness note unless it is still essential for the final paper.
+- [x] Reduce the quantile-crossing discussion to a brief robustness note unless it is still essential for the final paper.
   - Source: `R1-M3`
   - Current locations: `562-589`
 
@@ -495,8 +495,8 @@ Use this as the working order when actually editing the manuscript.
 ### Second pass: delete/shorten obvious excess
 - [x] PIT section from main text
 - [x] long CRPS derivation trimmed
-- [ ] synthesis section shortened
-- [ ] quantile-crossing correction reduced
+- [x] synthesis section shortened
+- [x] quantile-crossing correction reduced
 
 ### Third pass: introduction and section architecture
 - [ ] introduction rewritten
