@@ -281,7 +281,240 @@ Revise immediately if a paragraph contains:
 
 ---
 
-## 4. Revision order: easiest first, hardest last
+## 4. Structural blueprint for the revised manuscript
+
+This is the working architectural decision for the manuscript. Do not begin the large section rewrite without checking new edits against this map.
+
+### 4.1 Main structural decision
+The revised paper should be organized around one central contribution:
+- a Bayesian quantile-based correction-and-synthesis framework for river-flow forecasting
+
+The manuscript should no longer be organized around:
+- `Model A`
+- `Model B`
+- `Model C`
+
+Instead, the main text should present:
+- one shared latent quantile process
+- one source-linking structure for observations and agency products
+- one forecast-window extension
+- one main forecasting-validation result section
+
+### 4.2 What is central versus supporting
+
+#### Central in the main article
+- one compact final model description
+- one clear statement of the roles of USGS observations, retrospective products, forecast products, and forecast covariates
+- one clear rolling-origin forecasting design
+- one central comparative forecasting result
+- one concise interpretation block for the selected specification
+
+#### Supporting, not central
+- the pedagogical `Model A / Model B / Model C` build-up
+- long developmental explanations of nested variants
+- parameter-heavy source-specific tables
+- extended historical-fit illustrations
+- multiple synthesis illustrations
+
+#### Best candidates for supplement or appendix
+- ablation study
+- quantile-level scoring diagnostics
+- the second synthesis figure
+- one or both source-specific `gamma / sigma` tables
+- any figure or table that is informative but not needed to understand the main forecasting result
+
+Rule for these materials:
+- if moved out of the main article, they still need a clear home in the submission package and their placement must remain consistent with the rebuttal
+
+### 4.3 Final target section map
+
+#### Section 1. Introduction
+- keep as the problem-and-contribution entry point
+- update the closing roadmap paragraph only after the new structure is in place
+
+#### Section 2. Methodology
+Recommended subsection logic:
+1. Extended asymmetric Laplace likelihood
+2. Shared latent quantile process
+3. Source-specific observation equations
+4. Forecast-window extension
+5. Prior specification, inference, and tuning
+6. Posterior predictive synthesis
+
+Key rule:
+- benchmark variants such as `N / AL / exAL`, `U / M`, and `T0 / T1` should appear as restricted variants of the same framework, not as the conceptual backbone of the paper
+- the abstract model exposition should foreground the shared quantile process, its trend/seasonal/transfer components, and the source-specific discrepancy structure before introducing any benchmark simplifications
+
+#### Section 3. Application Data and Forecasting Design
+Recommended subsection logic:
+1. Study setting and target observations
+2. External data sources and forecast covariates
+3. Application-specific state specification
+4. Rolling-origin forecast evaluation design
+
+Key rule:
+- this section must explicitly distinguish USGS observations, retrospective products, forecast products, and forecast covariates before the main results section begins
+
+#### Section 4. Forecast Validation Results
+Recommended subsection logic:
+1. Comparative forecasting performance across model families
+
+Key rule:
+- the CRPS-based five-cutoff comparison should be the first major empirical result the reader sees
+
+#### Section 5. Interpretation of the Selected Specification
+Recommended subsection logic:
+1. Covariate effects and source-specific behavior
+2. Historical behavior across representative regimes
+3. Optional synthesized predictive illustration
+
+Key rule:
+- this section is supporting interpretation, not the paper's primary empirical evidence
+
+#### Section 6. Conclusions
+- rewrite only after the new body structure is stable
+
+### 4.4 Block-by-block migration map
+
+#### Methodology block map
+- `wileyNJD-APA.tex:77-80` exAL likelihood:
+  - keep in main text
+  - compress lightly later if needed
+- `wileyNJD-APA.tex:86-117` current `Model A`:
+  - rewrite into the new `Shared latent quantile process` subsection
+- `wileyNJD-APA.tex:119-149` current `Model B`:
+  - rewrite into the new `Source-specific observation equations` subsection
+- `wileyNJD-APA.tex:151-181` current `Model C`:
+  - rewrite into the new `Forecast-window extension` subsection
+- `wileyNJD-APA.tex:183-193` priors and discounting:
+  - keep
+  - compress where possible
+- `wileyNJD-APA.tex:195-208` posterior inference and VB:
+  - keep
+  - compress where possible
+- `wileyNJD-APA.tex:210-223` model selection:
+  - keep as revised
+
+#### Application/setup block map
+- `wileyNJD-APA.tex:228-241` study setting and target observations:
+  - keep
+  - compress
+  - lead explicitly with USGS as the target series
+- `wileyNJD-APA.tex:243-249` covariates and GDPC setup:
+  - keep
+  - compress substantially
+- `wileyNJD-APA.tex:251-258` covariates figure:
+  - keep in main text
+- `wileyNJD-APA.tex:260-262` retrospective and forecast-source description:
+  - keep
+  - rewrite for clearer data-role separation
+- `wileyNJD-APA.tex:264-269` retrospective-products figure:
+  - optional keep
+  - remove first if space becomes tight
+- `wileyNJD-APA.tex:271-278` old weighted multi-issuance protocol:
+  - delete from the main paper
+  - replace with the latest-forecast-only rolling-origin design
+- `wileyNJD-APA.tex:280-287` ensemble illustration figure:
+  - optional keep
+  - only as a setup illustration, not as core forecasting evidence
+- `wileyNJD-APA.tex:289-325` application-specific state specification:
+  - keep in main text
+  - rewrite lightly for clarity and centrality
+
+#### Forecast-results block map
+- `wileyNJD-APA.tex:331-362` benchmark comparison text and CRPS table:
+  - keep in main text
+  - this becomes the core empirical result
+- `wileyNJD-APA.tex:333` compact label explanation:
+  - keep with the benchmark table, not in the methods section
+
+#### Interpretation/supporting block map
+- `wileyNJD-APA.tex:364-431` `gamma / sigma` tables:
+  - move to supplement or appendix
+  - keep only a short prose summary in the main paper if needed
+- `wileyNJD-APA.tex:434-436` `gamma / sigma` interpretation:
+  - compress heavily
+  - retain only if needed to motivate source-specific parameters
+- `wileyNJD-APA.tex:438-475` regime figures and no-crossing discussion:
+  - compress heavily
+  - keep at most one compact interpretive figure block in the main paper
+- `wileyNJD-APA.tex:477-515` covariate-effects table and discussion:
+  - keep in main text if one interpretive table is retained
+  - this is a stronger candidate for the main paper than the `gamma / sigma` tables
+- `wileyNJD-APA.tex:518-540` synthesis definition:
+  - move conceptually to the methods section
+  - do not keep as a late results subsection
+- `wileyNJD-APA.tex:542-550` `fig:synth1`:
+  - optional keep as a single operational illustration
+- `wileyNJD-APA.tex:552-561` `fig:synth2`:
+  - move to supplement or delete
+- `wileyNJD-APA.tex:563-576` conclusions:
+  - full rewrite after the structure is stable
+
+### 4.5 Structural decisions that are now considered locked
+- remove the `Model A / Model B / Model C` progression from the main text as the organizing device
+- make the five-cutoff CRPS comparison the first major empirical result
+- remove the old weighted multi-issuance forecast-aggregation protocol
+- treat ablation and quantile-level scoring as supplement/appendix candidates rather than required main-text sections
+- keep at most one synthesis figure in the main text
+- split the current combined Section 3 into setup, forecast validation, and supporting interpretation
+
+### 4.6 Structural recheck after the planning pass
+This blueprint was rechecked against the current manuscript and rebuttal, and it remains the best high-quality option for the revised submission for five reasons:
+
+1. It matches the revised rebuttal without forcing every rebuttal artifact into the main article.
+2. It gives the paper one dominant narrative: forecasting with one unified framework.
+3. It separates out-of-sample evidence from historical interpretation, which is the main readability problem in the current draft.
+4. It removes the strongest source of conceptual clutter: the `Model A / B / C` staging.
+5. It preserves interpretive material, but only after the main forecasting evidence is established.
+
+If a later manuscript change conflicts with any of these five points, revisit this section before editing further.
+
+---
+
+## 5. Implementation order for the structural rewrite
+
+Use this order when the large section rewrite begins.
+
+### Stage 1. Replace the section skeleton first
+- update the roadmap sentence in the introduction only after the new section map is in place
+- replace the current combined Section 3 plan with the new Section 3 / Section 4 / Section 5 split
+- remove `General Results`
+- create the new subsection headings before rewriting local prose
+
+### Stage 2. Rebuild the methods around one framework
+- replace the `Model A / B / C` presentation with:
+  - shared latent quantile process
+  - source-specific observation equations
+  - forecast-window extension
+- keep benchmark-variant labeling out of the core methods exposition
+
+### Stage 3. Rewrite the application/setup section
+- lead with USGS as the target series
+- rewrite the source-role paragraphs
+- compress the GDPC and local covariate exposition
+- insert the rolling-origin forecast-design subsection
+- remove the old weighted forecast-aggregation text
+
+### Stage 4. Rebuild the main results flow
+- make the CRPS benchmark comparison the first result
+- keep the model-family label explanation with the benchmark table
+- move secondary result blocks out of the way before rewriting result prose
+
+### Stage 5. Rebuild the supporting interpretation section
+- decide which interpretive table stays in the main paper
+- decide which hydrological figure block stays in the main paper
+- decide whether one synthesis figure remains
+
+### Stage 6. Final consistency pass after the structure is in place
+- update the introduction roadmap
+- rewrite the conclusions
+- recheck manuscript vs rebuttal consistency
+- recheck all supplement candidates
+
+---
+
+## 6. Revision order: easiest first, hardest last
 
 This order is designed to reduce risk and keep the rebuttal and manuscript synchronized.
 
@@ -357,17 +590,10 @@ Goal: fix the motivation before touching results structure.
 ### Phase D. Data / application / section-organization rewrite
 Goal: fix the architecture that Reviewer 1 found confusing.
 
-- [ ] Decide the new section layout before editing prose.
+- [x] Decide the new section layout before editing prose.
   - Source: `R1-m4`, `R1-m7`, `R1-M2`
   - Current problem area: `247-610`
-
-Suggested target structure:
-1. Data and application setup
-2. Forecast design and inputs
-3. Final forecasting specification
-4. Forecast validation results
-5. Historical fit / parameter interpretation (if retained)
-6. Posterior predictive synthesis (if retained as a separate subsection)
+  - Final blueprint recorded in Section 4 of this checklist
 
 - [ ] Introduce USGS observations earlier and more explicitly as the target series.
   - Source: `R1-m4`
@@ -433,15 +659,15 @@ Goal: this is the main substantive rewrite.
 - [ ] Keep the comparison against simpler Bayesian alternatives and raw forecast products visible and easy to interpret.
   - Source: `HE-2`
 
-- [ ] Add the ablation-study results for the best model.
+- [ ] Decide whether the ablation study will appear in the supplement or appendix rather than in the main article.
   - Source: `HE-3`
-  - If this is not yet in the article, decide where it belongs in the forecasting-results section.
+  - Current structural decision: supplementary candidate by default
 
-- [ ] Add quantile-diagnostic reporting that complements CRPS.
+- [ ] Decide whether quantile-diagnostic reporting will appear in the supplement or appendix rather than in the main article.
   - Source: `HE-4`
-  - Make clear that CRPS is the main full-distribution score and quantile losses are complementary.
+  - Current structural decision: supplementary candidate by default
 
-### Phase G. Figures 8 and 9 / synthesis figures decision
+### Phase G. Interpretation and synthesis-material decision
 Goal: defer until the main forecasting rewrite is settled.
 
 - [ ] Decide whether `fig:synth1` and `fig:synth2` remain in the final paper.
@@ -453,6 +679,12 @@ If retained:
 
 If replaced:
 - [ ] update the manuscript and then recheck the rebuttal wording for `R1-m9`
+
+- [ ] Decide whether the `gamma / sigma` tables remain in the main paper or move to supplement.
+  - Source: structural blueprint Section 4
+
+- [ ] Decide whether the historical-regime figures remain as a compact main-text block or move to supplement.
+  - Source: structural blueprint Section 4
 
 ### Phase H. Conclusions and final consistency pass
 Goal: only after the body is stable.
@@ -480,7 +712,7 @@ Goal: only after the body is stable.
 
 ---
 
-## 5. Easy-to-hard execution checklist
+## 7. Easy-to-hard execution checklist
 
 Use this as the working order when actually editing the manuscript.
 
@@ -500,7 +732,7 @@ Use this as the working order when actually editing the manuscript.
 
 ### Third pass: introduction and section architecture
 - [x] introduction rewritten
-- [ ] section architecture decided
+- [x] section architecture decided
 - [ ] data/application ordering rewritten
 - [ ] `General Results` renamed/replaced
 
@@ -509,7 +741,7 @@ Use this as the working order when actually editing the manuscript.
 - [ ] five-cutoff rolling-origin design stated clearly
 - [ ] fit-time vs forecast-time vs verification distinction stated clearly
 - [ ] benchmark comparison fully aligned with rebuttal
-- [ ] ablation and quantile-diagnostic results integrated
+- [ ] supplement/appended placement for ablation and quantile diagnostics finalized
 
 ### Fifth pass: harder review-dependent items
 - [ ] five-cutoff justification after Raquel input
@@ -519,7 +751,7 @@ Use this as the working order when actually editing the manuscript.
 
 ---
 
-## 6. Practical workflow note
+## 8. Practical workflow note
 
 When actual manuscript editing starts, work in this loop:
 1. update one coherent block of the manuscript,
