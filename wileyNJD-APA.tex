@@ -1,5 +1,6 @@
 \documentclass[APA,STIX1COL]{WileyNJD-v2}
 \usepackage{siunitx}
+\usepackage{threeparttable}
 \usepackage{graphicx}
 \usepackage{subcaption}
 \usepackage{float}        % for [H] placement
@@ -40,7 +41,7 @@
 
 \presentaddress{University of California, Santa Cruz, Santa Cruz, CA, USA.}
 
-\abstract[Summary]{River-flow forecasting requires predictive distributions that remain informative in both routine and extreme conditions. We develop a Bayesian quantile-based correction-and-synthesis framework built on Dynamic Quantile Linear Models (DQLMs). The framework links USGS observations, retrospective products, and ensemble forecast products through a shared latent quantile process, learns dynamic discrepancies for each external source, and combines quantile-specific posterior predictions into a single predictive distribution. We also adapt variational Bayes inference to the extended dynamic quantile linear model using Laplace--Delta approximations for non-conjugate parameters. The methodology is studied using daily flow for the San Lorenzo River together with ECMWF/GloFAS and NOAA/NWS products, with emphasis on medium-range forecasting and uncertainty quantification across multiple quantile levels.}
+\abstract[Summary]{River-flow forecasting requires predictive distributions that remain informative in both routine and extreme conditions. We develop a Bayesian quantile-based correction-and-synthesis framework built on Dynamic Quantile Linear Models (DQLMs). The framework links United States Geological Survey (USGS) observations, retrospective products, and ensemble forecast products through a shared latent quantile process, learns dynamic discrepancies for each external source, and combines quantile-specific posterior predictions into a single predictive distribution. We also adapt variational Bayes inference to the extended dynamic quantile linear model (exDQLM) using Laplace--Delta approximations for non-conjugate parameters. The methodology is studied using daily flow for the San Lorenzo River together with European Centre for Medium-Range Weather Forecasts/Global Flood Awareness System (ECMWF/GloFAS) and National Oceanic and Atmospheric Administration/National Weather Service (NOAA/NWS) products, with emphasis on medium-range forecasting and uncertainty quantification across multiple quantile levels.}
 
 \keywords{Bayesian forecasting, quantile regression, dynamic models, river flow prediction}
 
@@ -52,7 +53,7 @@
 
 \maketitle
 
-\footnotetext{\textbf{Abbreviations:} CRPS, Continuous Ranked Probability Score; DQLM, Dynamic Quantile Linear Model.}
+\footnotetext{\textbf{Abbreviations:} AL, asymmetric Laplace; CRPS, continuous ranked probability score; DQLM, dynamic quantile linear model; ECMWF, European Centre for Medium-Range Weather Forecasts; exAL, extended asymmetric Laplace; exDQLM, extended dynamic quantile linear model; FFBS, forward filtering backward sampling; GIG, generalized inverse Gaussian; GloFAS, Global Flood Awareness System; NOAA, National Oceanic and Atmospheric Administration; NWM, National Water Model; NWS, National Weather Service; USGS, United States Geological Survey.}
 
 
 \section{INTRODUCTION}
@@ -63,7 +64,7 @@ Operational hydrological forecasts are commonly produced with conceptual or phys
 
 This problem is closely related to forecast combination and statistical post-processing, where multiple predictive sources are combined to improve calibration and sharpness \citep{siegert2019forecast, vannitsem, wang2022forecastcombinations50yearreview}. Bayesian formulations are especially appealing because they provide a coherent way to propagate uncertainty and update predictions as new information becomes available \citep{duan2006bma, yumnam2022quantile, aastveit2022quantifying, du2018ensemble_forecasting, doubleday, kleiber2011geostatistical, mcalinn2019dynamic, tallman2023bayesianpredictivedecisionsynthesis, johnson2023bayesian}. Our focus is on a quantile-based version of this problem, motivated by the need to represent both routine and extreme flow behavior.
 
-We develop a Bayesian quantile-based correction-and-synthesis framework for river flow forecasts. The framework builds on Dynamic Quantile Linear Models (DQLMs) \citep{goncalves, gourieroux2008dqlm, barata2021_flex_quantile} and has three main components. First, we extend posterior inference for the model using scalable variational Bayes methods for the extended dynamic quantile linear model, following the Laplace--Delta strategy of \citet{wang2013nonconjugatevb}. Second, we use retrospective products to learn dynamic discrepancies relative to USGS observations and propagate those discrepancies into the forecast period. Third, we synthesize the resulting quantile-specific predictive distributions into one predictive distribution for the river flow process.
+We develop a Bayesian quantile-based correction-and-synthesis framework for river flow forecasts. The framework builds on Dynamic Quantile Linear Models (DQLMs) \citep{goncalves, gourieroux2008dqlm, barata2021_flex_quantile} and has three main components. First, we extend posterior inference for the model using scalable variational Bayes methods for the extended dynamic quantile linear model (exDQLM), following the Laplace--Delta strategy of \citet{wang2013nonconjugatevb}. Second, we use retrospective products to learn dynamic discrepancies relative to USGS observations and propagate those discrepancies into the forecast period. Third, we synthesize the resulting quantile-specific predictive distributions into one predictive distribution for the river flow process.
 
 We study this framework using daily river flow for the San Lorenzo River together with retrospective and forecast products from ECMWF/GloFAS and NOAA/NWS. The empirical focus is forecasting performance and uncertainty quantification across multiple quantile levels, rather than only historical fit or methodological development in isolation. Although the application is hydrological, the same structure is relevant in other settings where observations, retrospective products, and forecast products all play distinct roles.
 
@@ -77,7 +78,7 @@ We first introduce some notation to be used throughout the article. We use bold 
 \subsection{Flexible Quantile Estimation: The Extended Asymmetric Laplace}
 \label{subsec:exal}
 
-The use of the Asymmetric Laplace (AL) distribution for quantile inference within a Bayesian framework is well-established with both empirical and theoretical justifications \citep{yu2001bayesian, sriram2013theoretical}. We use a recent extension of the AL distribution, which we refer to as the extended asymmetric Laplace (exAL), that addresses intrinsic issues for the AL working likelihood, such as the limitations imposed by its skewness. \citet{yan2025new} proposed the extended asymmetric Laplace (exAL) distribution, $\text{exAL}_{p_0}(\mu, \sigma, \gamma)$, where $\mu$ represents the $p_0$th quantile of interest, $\sigma$ is a positive scale parameter, and $\gamma$ is the skewness parameter. Moreover, the parameter $\gamma$ has bounded support over the interval $(L, U)$, where $L$ is the negative root of $g(\gamma) = 1 - p_0$ and $U$ is the positive root of $g(\gamma) = p_0$, with $g(\gamma) = 2 \Phi(-|\gamma|) \exp(\gamma^2 / 2)$ and $\Phi$ denoting the standard normal CDF. To improve the efficiency of our posterior sampling algorithms, we utilize the extended stochastic representation of an exAL random variable described in \citet{yan2025new}. That is, if $y \sim \text{exAL}(\mu, \sigma, \gamma)$, then there exist independent random variables $\epsilon \sim \mathcal{N}(0, 1)$, $z \sim \text{Exp}(1)$, and $s \sim \mathcal{N}^+(0, 1)$, (where $\mathcal{N}^+(0, 1)$ denotes the standard normal distribution truncated to the positive real line), such that  \( y = \mu + C(\gamma; p_0)\sigma |\gamma| s + A(\gamma; p_0) \sigma z + \sqrt{B(\gamma; p_0) \sigma^2 z} \cdot \epsilon, \) where $A(\gamma; p_0) = \frac{1 - 2 p(\gamma; p_0)}{p(\gamma; p_0) \, [1 - p(\gamma; p_0)]}$, $B(\gamma; p_0) = \frac{2}{p(\gamma; p_0) \, [1 - p(\gamma; p_0)]}$, $C(\gamma; p_0) = [I(\gamma > 0) - p(\gamma; p_0)]^{-1}$, and $p(\gamma; p_0) = I(\gamma < 0) + \{p_0 - I(\gamma < 0)\} / g(\gamma)$.
+The use of the Asymmetric Laplace (AL) distribution for quantile inference within a Bayesian framework is well-established with both empirical and theoretical justifications \citep{yu2001bayesian, sriram2013theoretical}. We use a recent extension of the AL distribution, which we refer to as the extended asymmetric Laplace (exAL), that addresses intrinsic issues for the AL working likelihood, such as the limitations imposed by its skewness. \citet{yan2025new} proposed the extended asymmetric Laplace (exAL) distribution, $\text{exAL}_{p_0}(\mu, \sigma, \gamma)$, where $\mu$ represents the $p_0$th quantile of interest, $\sigma$ is a positive scale parameter, and $\gamma$ is the skewness parameter. Moreover, the parameter $\gamma$ has bounded support over the interval $(L, U)$, where $L$ is the negative root of $g(\gamma) = 1 - p_0$ and $U$ is the positive root of $g(\gamma) = p_0$, with $g(\gamma) = 2 \Phi(-|\gamma|) \exp(\gamma^2 / 2)$ and $\Phi$ denoting the standard normal CDF. To improve the efficiency of our posterior sampling algorithms, we utilize the extended stochastic representation of an exAL random variable described in \citet{yan2025new}. That is, if $y \sim \text{exAL}(\mu, \sigma, \gamma)$, then there exist independent random variables $\epsilon \sim \mathcal{N}(0, 1)$, $z \sim \text{Exp}(1)$, and $s \sim \mathcal{N}^+(0, 1)$, (where $\mathcal{N}^+(0, 1)$ denotes the standard normal distribution truncated to the positive real line), such that  \( y = \mu + C(\gamma; p_0)\sigma |\gamma| s + A(\gamma; p_0) \sigma z + \sqrt{B(\gamma; p_0) \sigma^2 z} \cdot \epsilon, \) where $A(\gamma; p_0) = \frac{1 - 2 p(\gamma; p_0)}{p(\gamma; p_0) \, [1 - p(\gamma; p_0)]}$, $B(\gamma; p_0) = \frac{2}{p(\gamma; p_0) \, [1 - p(\gamma; p_0)]}$, $C(\gamma; p_0) = [I(\gamma > 0) - p(\gamma; p_0)]^{-1}$, $p(\gamma; p_0) = I(\gamma < 0) + \{p_0 - I(\gamma < 0)\} / g(\gamma)$, and $I(\cdot)$ is the indicator function.
 
 
 \subsection{Full State-Space Specification}
@@ -136,7 +137,7 @@ so the USGS mean is the latent quantile \(\mathbf{F}_t' \boldsymbol{\theta}_t + 
 \[
 \boldsymbol{D}_t = \text{BlockDiag}\!\left(\mathbf{G}_t, \mathbf{G}_t, \ldots, \mathbf{G}_t, \mathbf{G}^{\text{trans}}_t\right),
 \]
-with \(\mathbf{G}_t\) repeated once for the latent trend/seasonal block and once for each discrepancy block, and
+where \(\text{BlockDiag}(\cdot)\) denotes block-diagonal concatenation, with \(\mathbf{G}_t\) repeated once for the latent trend/seasonal block and once for each discrepancy block, and
 \[
 \boldsymbol{\Lambda}_t = \text{BlockDiag}\!\left(\mathbf{W}^{\theta}_t, \mathbf{W}^{\delta^1}_t, \ldots, \mathbf{W}^{\delta^J}_t, w_t^{\zeta}, \mathbf{W}^{\psi}_t\right).
 \]
@@ -151,9 +152,9 @@ Let \(K_{(j)}\) denote the horizon length of forecaster \(j\), ordered so that \
 \begin{align}
     \text{Forecast products}:&& y_T^{j,i}(k) \mid \boldsymbol{\eta}_{T+k}, \sigma^j, \gamma^j &\sim \text{exAL}_{p_0}\!\left(\mathbf{e}_{T+k,j}' \boldsymbol{\eta}_{T+k}, \sigma^j, \gamma^j\right), \label{eq:forecastobs} \\
     \text{Forecast-window states}:&& \boldsymbol{\eta}_{T+k} \mid \boldsymbol{\eta}_{T+k-1} &\sim \mathcal{N}\!\left(\boldsymbol{M}_{T+k} \boldsymbol{\eta}_{T+k-1}, \mathbf{W}_{T+k}\right), \label{eq:forecaststate} \\
-    \text{Stochastic covariance}:&& \mathbf{W}_{T+k} &\sim \text{InvWishart}(\nu_{T+k}, S_{T+k}).
+    \text{Stochastic covariance}:&& \mathbf{W}_{T+k} &\sim \text{Inverse-Wishart}(\nu_{T+k}, S_{T+k}).
 \end{align}
-The vector \(\mathbf{e}_{T+k,j}\) is the forecast-window analogue of \(\mathbf{h}_{t,j}\): it extracts the latent trend/seasonal block, the discrepancy block for source \(j\), and, when active, the transfer block. The matrix \(\boldsymbol{M}_{T+k}\) propagates the same components forward into the forecast window. In the full specification used by exAL-M-T1, the transfer states \((\zeta_t,\boldsymbol{\psi}_t)\) remain active and the forecast covariates available at the cutoff are propagated through the transition block. The reduced T0 variant is obtained by suppressing this forecast-window transfer block after the cutoff.
+The vector \(\mathbf{e}_{T+k,j}\) is the forecast-window analogue of \(\mathbf{h}_{t,j}\): it extracts the latent trend/seasonal block, the discrepancy block for source \(j\), and, when active, the transfer block. The matrix \(\boldsymbol{M}_{T+k}\) propagates the same components forward into the forecast window. In the active-transfer multivariate exAL specification, the transfer states \((\zeta_t,\boldsymbol{\psi}_t)\) remain active and the forecast covariates available at the cutoff are propagated through the transition block. The reduced no-transfer variant is obtained by suppressing this forecast-window transfer block after the cutoff.
 
 Equations \eqref{eq:usgsobs}--\eqref{eq:forecaststate} define one state-space model with time-dependent observation channels. In implementation, the forecast-window vectors and matrices are reduced to the forecasters whose horizons remain active at a given lead time. This simplifies computation without changing the model.
 
@@ -174,7 +175,7 @@ Further details regarding prior specification and discount factors are provided 
 \subsection{Posterior Inference}
 \label{subsec:postinf}
 The posterior distribution of all model parameters is explored using a Markov chain Monte Carlo (MCMC) algorithm.
-Algorithm~\ref{alg1} gives the core MCMC updates in a compact source-indexed notation. During the estimation period, the active source channels are the USGS observations and retrospective products; after the cutoff, the same updates use the active forecast-product channels, with additional bookkeeping to handle the trans-dimensional state vector when forecast horizons differ across agencies. All full conditional posteriors are available in closed form except for the skewness parameters $\gamma^j$, $1 \leq j \leq J$. For these, we use a Metropolis--Hastings random walk on an unconstrained reparameterization. Posterior sampling of the state parameters relies on a modified Forward Filtering Backward Sampling (FFBS) algorithm that leverages their conditional normality (see Algorithm~\ref{alg:Alg2}).
+Algorithm~\ref{alg1} gives the core MCMC updates in a compact source-indexed notation. During the estimation period, the active source channels are the USGS observations and retrospective products; after the cutoff, the same updates use the active forecast-product channels, with additional bookkeeping to handle the trans-dimensional state vector when forecast horizons differ across agencies. All full conditional posteriors are available in closed form except for the skewness parameters $\gamma^j$, $1 \leq j \leq J$. For these, we use a Metropolis--Hastings (MH) random walk on an unconstrained reparameterization. Posterior sampling of the state parameters relies on a modified Forward Filtering Backward Sampling (FFBS) algorithm that leverages their conditional normality (see Algorithm~\ref{alg:Alg2}).
 
 %\subsubsection{Variational Bayes Implementation} \label{subsec:vb}
 
@@ -189,7 +190,7 @@ We present the pseudocode for the VB algorithm associated with our model in Algo
 \subsection{Model Selection}
 \label{subsec:modelselection}
 
-For model selection, we use the Continuous Ranked Probability Score (CRPS) rather than PIT-based diagnostics. Following \citet{barata2021_flex_quantile}, we treat the discount-factor specification as fixed within a candidate model and select the transfer rate \(\lambda\) by minimizing the average one-step-ahead CRPS. In particular,
+For model selection, we use the Continuous Ranked Probability Score (CRPS) rather than probability integral transform (PIT)-based diagnostics. Following \citet{barata2021_flex_quantile}, we treat the discount-factor specification as fixed within a candidate model and select the transfer rate \(\lambda\) by minimizing the average one-step-ahead CRPS. In particular,
 \[
 \lambda^{\text{opt}} \in \arg\min_{\lambda} \frac{1}{T}\sum_{t=1}^T \text{CRPS}(y_t,p_t^{\lambda}),
 \]
@@ -223,7 +224,7 @@ The application combines the USGS target series with three additional informatio
 
 \subsection{External Data Sources and Forecast Covariates}
 
-The transfer component uses both local hydrological covariates and a large-scale climate factor. The local covariates are precipitation from the PRISM Climate Group \citep{prism} and soil moisture from ECMWF ERA5-Land \citep{ecmwf}. The ERA5-Land fields are reanalysis-based inputs rather than direct observations, and some variables may include short forecast components.
+The transfer component uses both local hydrological covariates and a large-scale climate factor. The local covariates are precipitation from the PRISM Climate Group \citep{prism} and soil moisture from the ECMWF ERA5-Land reanalysis \citep{ecmwf}. The ERA5-Land fields are reanalysis-based inputs rather than direct observations, and some variables may include short forecast components.
 
 To represent broader climate conditions, we also use a collection of monthly climate and environmental indices from \citet{noaa_climate_indices}, including solar flux, Niño 1+2, the Oceanic Niño Index (ONI), the Southern Oscillation Index (SOI), the Western Hemisphere Warm Pool (WHWP), the Global Mean Temperature (GMT), the Northern Oscillation Index (NOI), the Atlantic Multidecadal Oscillation (AMO), and the Tropical South (TSA) and North Atlantic (TNA) indices. These series are interpolated to daily resolution to align with the hydrological data.
 
@@ -293,7 +294,7 @@ We choose discount factors componentwise to reflect each component’s time scal
 
 \subsection{Rolling-Origin Forecast Evaluation Design}
 
-The out-of-sample evaluation uses five rolling-origin cutoff dates that span contrasting hydrological conditions and remain compatible with the archived retrospective and forecast products available from each agency. At a cutoff \(c\), the model is fit using USGS observations and retrospective products available through \(c\). Forecasts are then generated over the subsequent forecast window using the latest forecast products issued at or before \(c\), and, for the T1 specification, the forecast covariates available at that origin. Post-cutoff USGS observations are reserved strictly for verification and are not used to fit or update the predictive distributions.
+The out-of-sample evaluation uses five rolling-origin cutoff dates that span contrasting hydrological conditions and remain compatible with the archived retrospective and forecast products available from each agency. At a cutoff \(c\), the model is fit using USGS observations and retrospective products available through \(c\). Forecasts are then generated over the subsequent forecast window using the latest forecast products issued at or before \(c\) and, when applicable, the forecast covariates available at that origin. Post-cutoff USGS observations are reserved strictly for verification and are not used to fit or update the predictive distributions.
 
 GloFAS issues forecast products daily, whereas NWS issues them hourly. To maintain temporal consistency across sources, we aggregate the NWS products to daily resolution and then retain only the most recent daily issue available at each cutoff. Figure~\ref{fig:ensembles} illustrates the resulting information structure for the representative cutoff on December 25, 2022. The GloFAS forecast window extends from December 25, 2022 to January 22, 2023, whereas the NWS forecast window extends from December 25, 2022 to January 5, 2023.
 
@@ -314,12 +315,12 @@ GloFAS issues forecast products daily, whereas NWS issues them hourly. To mainta
 
 We fit the framework separately at the seven target quantile levels \(0.05\), \(0.20\), \(0.35\), \(0.50\), \(0.65\), \(0.80\), and \(0.95\). Forecast skill is then evaluated over each forecast window by the mean continuous ranked probability score (CRPS), using the variational Bayes fits described in Section~\ref{subsec:prioranddisc}.
 
-Table~\ref{tab:benchmark_crps_models} compares the raw forecast products with nine Bayesian variants of the common state-space framework. These variants differ only in three respects: the observation likelihood, whether the synthesis uses only the USGS series or the full multivariate data set, and whether the transfer component remains active during the forecast window. We summarize them with the label \(L\)-\(S\)-\(T\), where \(L\in\{\mathrm{N},\mathrm{AL},\mathrm{exAL}\}\) indexes the likelihood, \(S\in\{\mathrm{U},\mathrm{M}\}\) indicates univariate or multivariate synthesis, and \(T\in\{\mathrm{T0},\mathrm{T1}\}\) indicates whether the transfer component is inactive or active during the forecast window. The raw baselines are the daily GloFAS and NWM forecast products evaluated without statistical correction.
+Table~\ref{tab:benchmark_crps_models} compares the raw forecast products with nine Bayesian variants of the common state-space framework. These variants differ only in three respects: the observation likelihood, whether the synthesis uses only the USGS series or the full multivariate data set, and whether the transfer component remains active during the forecast window. We summarize them with the label \(L\)-\(S\)-\(T\), where \(L\in\{\mathrm{N},\mathrm{AL},\mathrm{exAL}\}\) indexes the likelihood, with \(N\) denoting a Gaussian likelihood; \(S\in\{\mathrm{U},\mathrm{M}\}\) indicates univariate or multivariate synthesis; and \(T\in\{\mathrm{T0},\mathrm{T1}\}\) indicates whether the transfer component is inactive or active during the forecast window. The raw baselines are the daily GloFAS and NWM forecast products evaluated without statistical correction.
 
 \begin{table*}[htbp]
 \centering
 \renewcommand{\arraystretch}{1.08}
-\caption{Mean forecast-window CRPS by model family and cutoff across the five rolling-origin evaluation folds. Lower values are better; bold indicates the lowest CRPS within each cutoff column.}
+\caption{Mean forecast-window CRPS by model family and cutoff across the five rolling-origin evaluation folds. Model labels use \(L\)-\(S\)-\(T\): \(N\), AL, and exAL denote Gaussian, asymmetric Laplace, and extended asymmetric Laplace observation likelihoods; \(U\) and \(M\) denote univariate and multivariate synthesis; and T0 and T1 denote inactive and active forecast-window transfer components. RAW-NWM is the raw National Water Model baseline. Lower values are better; bold indicates the lowest CRPS within each cutoff column.}
 \label{tab:benchmark_crps_models}
 \begin{tabular*}{\textwidth}{@{\extracolsep{\fill}} >{\ttfamily}l r r r r r}
 \toprule
@@ -379,7 +380,7 @@ Because exAL-M-T1 attains the lowest CRPS in all five rolling-origin cutoffs, th
 \bottomrule
 \end{tabular*}
 \begin{tablenotes}
-\item \textit{Note:} Posterior means and 95\% credible intervals $[{\rm Q2.5}, {\rm Q97.5}]$ for covariate coefficients in the transfer function, at final time $T$, for the 5th, 50th, and 95th quantile models.
+\item \textit{Note:} Posterior means and 95\% credible intervals (CIs) $[{\rm Q2.5}, {\rm Q97.5}]$ for covariate coefficients in the transfer function, at final time $T$, for the 5th, 50th, and 95th quantile models.
 \end{tablenotes}
 \end{threeparttable}
 \end{table*}
@@ -452,7 +453,7 @@ Foundation grant MMS2050012.
 
 \section*{Code availability}
 
-The reusable exDQLM estimation routines are available through the CRAN R package \texttt{exdqlm}. The end-to-end forecasting workflow used in this study is available at \url{https://github.com/AntonioAPDL/Project1}. Applying that workflow to a new basin still requires constructing a basin-specific, version-consistent archive of observations, retrospective products, forecast products, and forecast covariates.
+The reusable exDQLM estimation routines are available through the Comprehensive R Archive Network (CRAN) R package \texttt{exdqlm}. The end-to-end forecasting workflow used in this study is available at \url{https://github.com/AntonioAPDL/Project1}. Applying that workflow to a new basin still requires constructing a basin-specific, version-consistent archive of observations, retrospective products, forecast products, and forecast covariates.
 
 %\subsection*{Author contributions}
 
@@ -505,7 +506,7 @@ The reusable exDQLM estimation routines are available through the CRAN R package
 \bottomrule
 \end{tabular*}
 \begin{tablenotes}
-\item \textit{Note:} Entries show the posterior median and the 95\% credible interval $[{\rm Q2.5}, {\rm Q97.5}]$ for each source and quantile.
+\item \textit{Note:} Entries show the posterior median and the 95\% credible interval (CI) $[{\rm Q2.5}, {\rm Q97.5}]$ for each source and quantile.
 \end{tablenotes}
 \end{table*}
 
@@ -539,7 +540,7 @@ The reusable exDQLM estimation routines are available through the CRAN R package
 \bottomrule
 \end{tabular*}
 \begin{tablenotes}
-\item \textit{Note:} Entries show the posterior median and the 95\% credible interval $[{\rm Q2.5}, {\rm Q97.5}]$ for each source and quantile.
+\item \textit{Note:} Entries show the posterior median and the 95\% credible interval (CI) $[{\rm Q2.5}, {\rm Q97.5}]$ for each source and quantile.
 \end{tablenotes}
 \end{table*}
 
@@ -582,14 +583,15 @@ Figure~\ref{fig:synth2} provides a historical-only reference for the December 25
 \State  \(
 A^j = A(\gamma^j;p_0), \quad B^j = B(\gamma^j;p_0), \quad C^j = C(\gamma^j;p_0), \text{ as defined in Section~\ref{subsec:exal}}
 \)
+\State \(\mathcal{GIG}\) denotes the generalized inverse Gaussian distribution.
 \State For compactness, \(y_t^j\) denotes the active observation or product for source \(j\), and \(\mathbf{h}_{t,j}\) denotes the corresponding active selector vector: the retrospective selector during the estimation period and the forecast-window selector after the cutoff.
 \vspace{0.1cm}
-\hline
+\Statex \rule{\linewidth}{0.4pt}
 \vspace{0.1cm}
 
 
 \State \textbf{Step 0: Set initial values} and sample size $N$.
-\State Initialize $\{ (v^j)^{(0)}_{1:T}$, $(s^j)^{(0)}_{1:T}$, $(\boldsymbol{\eta})^{(0)}_{1:T}, $(\sigma^j)^{(0)}$, $(\gamma^j)^{(0)}\}_{j=0}^J$
+\State Initialize $\{(v^j)^{(0)}_{1:T}, (s^j)^{(0)}_{1:T}, (\boldsymbol{\eta})^{(0)}_{1:T}, (\sigma^j)^{(0)}, (\gamma^j)^{(0)}\}_{j=0}^J$
 \For{$n = 1$ to $N$}
     \State \textbf{Step 1: Update $\boldsymbol{\eta}_t$}
     \State Use Algorithm~\ref{alg:Alg2}
@@ -643,9 +645,9 @@ A^j = A(\gamma^j;p_0), \quad B^j = B(\gamma^j;p_0), \quad C^j = C(\gamma^j;p_0),
 \State \( \mathbf{v}_t = \big[  v^j_t   \big], \quad  \mathbf{s}_t = \big[ 
 s^j_t  \big] , \quad \mathbf{\sigma} = \big[ \sigma^j  \big]
 \)
-\State \text{where } \odot \text{ is the Hadamard product}
+\State where \(\odot\) is the Hadamard product and \(\mathrm{Diag}(\cdot)\) forms a diagonal matrix
 \vspace{0.1cm}
-\hline
+\Statex \rule{\linewidth}{0.4pt}
 \vspace{0.1cm}
 
 \State \textbf{Step 1: Forward Filtering}
@@ -695,7 +697,7 @@ s^j_t  \big] , \quad \mathbf{\sigma} = \big[ \sigma^j  \big]
 A^j = A(\gamma^j;p_0), \quad B^j = B(\gamma^j;p_0), \quad C^j = C(\gamma^j;p_0), \text{ as defined in Section~\ref{subsec:exal}}
 \)
 \vspace{0.1cm}
-\hline
+\Statex \rule{\linewidth}{0.4pt}
 \vspace{0.1cm}
 
 \State \textbf{Step 0: Set initial values}
@@ -743,9 +745,9 @@ A^j = A(\gamma^j;p_0), \quad B^j = B(\gamma^j;p_0), \quad C^j = C(\gamma^j;p_0),
 \State \( \mathbf{v}_t = \big[ \left\langle v^j_t  \right\rangle \big], \quad  \mathbf{s}_t = \big[ \left\langle
 s^j_t  \right\rangle \big] , \quad \mathbf{\sigma} = \big[ \left\langle \sigma^j  \right\rangle \big]
 \)
-\State \text{where } \odot \text{ is the Hadamard product}
+\State where \(\odot\) is the Hadamard product and \(\mathrm{Diag}(\cdot)\) forms a diagonal matrix
 \vspace{0.1cm}
-\hline
+\Statex \rule{\linewidth}{0.4pt}
 \vspace{0.1cm}
 
 \State \textbf{Step 1: Forward Filtering}
