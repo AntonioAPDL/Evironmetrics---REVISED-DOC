@@ -315,12 +315,12 @@ Goal: clean low-risk issues first.
 ### Phase B. Shorten math and trim nonessential exposition
 Goal: reduce obvious overlength before structural rewrites.
 
-- [ ] Remove PIT development from the main text.
+- [x] Remove PIT development from the main text.
   - Source: `R1-M3`
   - Current location: `216-245`
   - Keep only what is truly needed, if anything, outside the main text.
 
-- [ ] Shorten the model-selection discussion so CRPS is the main criterion without a long PIT-centered setup.
+- [x] Shorten the model-selection discussion so CRPS is the main criterion without a long PIT-centered setup.
   - Source: `HE-4`, `R1-M3`
   - Current location: `216-245`
 
@@ -493,8 +493,8 @@ Use this as the working order when actually editing the manuscript.
 - [x] code/reproducibility note
 
 ### Second pass: delete/shorten obvious excess
-- [ ] PIT section from main text
-- [ ] long CRPS derivation trimmed
+- [x] PIT section from main text
+- [x] long CRPS derivation trimmed
 - [ ] synthesis section shortened
 - [ ] quantile-crossing correction reduced
 

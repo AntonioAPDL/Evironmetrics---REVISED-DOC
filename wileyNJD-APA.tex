@@ -216,33 +216,17 @@ To illustrate our VB-LD strategy, consider a generic joint distribution \( p(D,\
 \subsection{Model Selection}
 \label{subsec:modelselection}
 
-A well-calibrated predictive distribution is characterized by a uniformly distributed probability integral transform (PIT), defined as \( u_t := \mathcal{Pr}(Y_t \leq y_t \mid \boldsymbol{\xi}_t, D_{t-1}) \), where \(Y_t\) denotes the observation, \(\boldsymbol{\xi}_t\) represents model parameters, and \(D_{t-1}\) is the historical data up to time \(t-1\). Deviations from uniformity in the PIT reveal predictive deficiencies, such as over- or under-dispersion. While this definition is univariate, in \textbf{Model B} we work with the \((J\!+\!1)\)-dimensional vector of outcomes \( \mathbf{Y}_t := (y_t^{o}, z_t^{1}, \ldots, z_t^{J})' \), so we evaluate calibration via a PIT \emph{vector} obtained componentwise.
+For model selection, we use the Continuous Ranked Probability Score (CRPS) rather than PIT-based diagnostics. Following \citet{barata2021_flex_quantile}, we treat the discount-factor specification as fixed within a candidate model and select the transfer rate \(\lambda\) by minimizing the average one-step-ahead CRPS. In particular,
+\[
+\lambda^{\text{opt}} \in \arg\min_{\lambda} \frac{1}{T}\sum_{t=1}^T \text{CRPS}(y_t,p_t^{\lambda}),
+\]
+where \(p_t^{\lambda}\) denotes the predictive distribution at time \(t\) under transfer rate \(\lambda\).
 
-Under \textbf{Model B}, the joint predictive distribution at time \(t\) is
-\( \mathbf{Y}_t \mid \nu^{o:J}_t, s^{o:J}_t, \sigma^{o:J}, D_{t-1} \sim \mathcal{N}(\mathbf{f}_t, \mathbf{Q}_t) \) on \( \mathbb{R}^{J+1} \),
-where \(\mathbf{f}_t\) and \(\mathbf{Q}_t\) are defined in Algorithms~\ref{alg:Alg2} and \ref{alg:Alg4}. The standardized forecast error vector
-\( \mathbf{e}_t := \mathbf{Q}_t^{-1/2}(\mathbf{Y}_t - \mathbf{f}_t) \)
-then follows a multivariate standard normal distribution,
-\( \mathbf{e}_t \sim \mathcal{N}(\mathbf{0}, \mathbf{I}_{J+1}) \),
-under correct specification. Consequently, the PIT vector is
-\( \mathbf{u}_t := \boldsymbol{\Phi}(\mathbf{e}_t) \in (0,1)^{J+1} \),
-where \(\boldsymbol{\Phi}\) applies the univariate standard normal CDF componentwise. This establishes the equivalence between a well-calibrated model—where \(\mathbf{u}_t\) is uniform on the unit \((J\!+\!1)\)-cube—and standardized forecast errors that are multivariate standard normal.
-
-% \citet{barata2021_flex_quantile} originally proposed selecting the optimal set of n discount factors \(\mathbf{d} \in (0,1)^{n}\) and a transfer rate \(\lambda\), by minimizing the Kullback–Leibler (KL) divergence: \( (\mathbf{d}, \lambda)^{\text{opt}} \in \arg\min_{\mathbf{d}, \lambda} \text{D}_{\text{KL}}\left(p_t^{(\mathbf{d}, \lambda)} \| \mathcal{N}(\mathbf{0}, \mathbf{I})\right), \)
-% where \(p_t^{(\mathbf{d}, \lambda)}\) denotes the distribution of the standardized error \(\mathbf{e}_t\) at time \(t\). Intuitively, this approach seeks to select parameters that minimize the distance between the forecast error distribution and the standard normal.
-
-\citet{barata2021_flex_quantile} originally proposed fixing a priori a set of n discount factors \(\mathbf{d} \in (0,1)^{n}\), and selecting for the optimal transfer rate \(\lambda\), by minimizing the Kullback–Leibler (KL) divergence: \( \lambda^{\text{opt}} \in \arg\min_{ \lambda} \text{D}_{\text{KL}}\left(p_t^{\lambda} \| \mathcal{N}(\mathbf{0}, \mathbf{I})\right), \)
-where \(p_t^{\lambda}\) denotes the distribution of the standardized error \(\mathbf{e}_t\) at time \(t\), for a given transfer rate $\lambda$. Intuitively, this approach seeks to select parameters that minimize the distance between the forecast error distribution and the standard normal.
-
-We consider an alternative criterion to measure the discrepancy from the standard normal distribution. After extensive simulation analyses comparing various divergence and distance measures, we adopt the Continuous Ranked Probability Score (CRPS) as our model selection criterion. The optimal parameters are thus determined by minimizing the expected CRPS: \( \lambda^{\text{opt}} \in \arg\min_{\lambda}\mathbb{E}_y\left[\text{CRPS}(y, p_t^{\lambda})\right], \) which we approximate empirically by averaging over time:
-\( \frac{1}{T}\sum_{t=1}^T \text{CRPS}(y_t,p_t^{\lambda}). \) 
-
-The CRPS for a predictive distribution \(\mathbf{G}\) and an observation \(y\) is defined as \( \text{CRPS}(y, \mathbf{G}) = \mathbb{E}_{Y \sim \mathbf{G}}|Y - y| - \frac{1}{2}\mathbb{E}_{Y,Y'\sim \mathbf{G}}|Y - Y'|. \) For the special case of a normal predictive distribution, \(\mathbf{G} = \mathcal{N}(\mu, \sigma^2)\), the CRPS simplifies analytically to
-\( \sigma\left[\tilde{y}(2\Phi(\tilde{y}) - 1) + 2\phi(\tilde{y}) - \frac{1}{\sqrt{\pi}}\right], \quad \text{where} \quad \tilde{y} = \frac{y-\mu}{\sigma}, \)
-with \(\phi\) and \(\Phi\) denoting the standard normal probability density and cumulative distribution functions, respectively. Moreover, under normality, the CRPS at time \(t\) can be expressed explicitly in terms of the standardized error as
-\( \text{CRPS}(y_t, \mathcal{N}(\mathbf{f}_t, \mathbf{Q}_t)) = \mathbf{Q}_t \cdot \text{CRPS}(\mathbf{e}_t, \mathcal{N}(\mathbf{0}, \mathbf{I})). \)
-
-The CRPS provides a direct measure of predictive accuracy that explicitly accounts for both calibration and sharpness, and it generalizes the Mean Absolute Error (MAE), coinciding exactly with the MAE for deterministic (point) forecasts. 
+We use CRPS because it scores the full predictive distribution and accounts jointly for calibration and sharpness. For a predictive distribution \(\mathbf{G}\) and an observation \(y\), the CRPS is
+\[
+\text{CRPS}(y, \mathbf{G}) = \mathbb{E}_{Y \sim \mathbf{G}}|Y - y| - \frac{1}{2}\mathbb{E}_{Y,Y'\sim \mathbf{G}}|Y - Y'|.
+\]
+It also reduces to the mean absolute error for deterministic forecasts, which makes it a natural criterion for comparing the candidate predictive specifications considered below.
 
 \section{FORECASTING THE SAN LORENZO RIVER FLOW}
 \label{sec:data}
